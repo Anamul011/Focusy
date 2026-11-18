@@ -173,6 +173,32 @@ input[type=range]{padding:0;min-height:36px;accent-color:#6C5CE7}
 [data-s=break]{animation:sway 4s ease-in-out infinite}
 .tm-brk::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #6ee7c8;animation:ripple 3.4s ease-out infinite;pointer-events:none}
 #mvp .mvc{animation:rise .3s ease-out}}
+body{padding-top:env(safe-area-inset-top,0px)}
+#timer:not(.jm){padding-top:env(safe-area-inset-top,0px)}
+/* ===== Deadlines card (progress ring + pill) ===== */
+body[data-v="deadlines"] #fab{display:none}
+.row.dcard{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.dcard .rt{flex:1;min-width:0}
+.dcard .rt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+.pill{display:inline-block;max-width:100%;margin-top:6px;padding:3px 10px;border-radius:99px;font-size:12px;line-height:1.4;font-weight:500;color:var(--tx);background:color-mix(in srgb,var(--sc) 20%,transparent);border:1px solid color-mix(in srgb,var(--sc) 48%,transparent);overflow-wrap:anywhere}
+.dcard .pl{margin-top:9px}
+.pcap{display:block;margin-top:6px;font-size:12px;line-height:1.35;color:var(--mut)}
+.ring{position:relative;width:54px;height:54px;flex:none;display:grid;place-items:center;cursor:pointer}
+.ring::before{content:"";position:absolute;inset:-7px;border-radius:50%;background:radial-gradient(circle,var(--gc) 0%,transparent 66%);opacity:.3;pointer-events:none}
+.ring svg{position:relative;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring circle{fill:none;stroke-width:3.4}
+.ring .rd{fill:#16112f;stroke:none}.ring .rb{stroke:rgba(255,255,255,.12)}
+.ring .rf{stroke:var(--gc);stroke-linecap:round;filter:drop-shadow(0 0 3px var(--gc))}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;text-shadow:none}
+.ring.p100 span{font-size:13px}
+.ring.g-n::before{opacity:0}.ring.g-n .rf{filter:none}
+.ring.g-n span{color:rgba(255,255,255,.7)}
+@media(prefers-reduced-motion:no-preference){
+ .ring:not(.g-p):not(.g-n)::before{animation:breathe 3.6s ease-in-out infinite}
+ .dcard .pl i{transition:width .9s ease}}
+@keyframes breathe{0%,100%{opacity:.22;transform:scale(.96)}50%{opacity:.5;transform:scale(1.06)}}
+@media(max-width:350px){.ring{width:48px;height:48px}.ring span{font-size:13px}.ring.p100 span{font-size:11.5px}.row.dcard{gap:9px;padding:11px 12px}}
+
 /* ===== Focusy Journey ===== */
 #timer.jm{padding:0;gap:0;justify-content:flex-start;align-items:stretch;background:#0b0820}
 .jscene{position:relative;flex:1;min-height:0;overflow:hidden}
@@ -265,6 +291,18 @@ const mvStart=(z,now,cfg)=>{z.elapsed+=z.resumedAt?now-z.resumedAt:0;z.resumedAt
 const mvSnooze=(z,now,mins)=>{z.mv.state='idle';z.mv.next=sessAt(z,now)+mins*6e4};
 const mvSkip=(z,now,cfg)=>{const f=sessAt(z,now);z.mv.state='idle';z.mv.base=f;z.mv.next=f+cfg.every*6e4};
 const mvResume=(z,now,cfg)=>{z.resumedAt=now;z.mv={state:'idle',base:z.elapsed,next:z.elapsed+cfg.every*6e4}};
+/* Native layer: JS timers stop when a phone app is backgrounded, so the OS must fire the alerts. This pure function lists every alert that should be scheduled for the current session (ids are fixed so each save replaces the previous schedule). */
+/* Deadline cards: progress colour bands and wording. Progress colours are independent of deadline urgency colours. */
+const progPct=f=>Math.max(0,Math.min(100,Math.floor(f*100+1e-9)));
+const progBand=p=>p>=100?{k:'p',c:'#A78BFA'}:p>=80?{k:'g',c:'#5EEA8A'}:p>=60?{k:'y',c:'#FFD166'}:p>=40?{k:'o',c:'#FF9F43'}:{k:'r',c:'#FF6B7A'};
+const dueRel=d=>d<0?`${-d} day${d===-1?'':'s'} overdue`:d===0?'due today':`${d} day${d===1?'':'s'} left`;
+const NOTE_IDS=[9001,9002,9003];
+function notePlan(z,now,cfg){const out=[];if(!z)return out;const m=z.mv,st=m&&m.state;
+ if(st==='break'){if(m.breakEnd>now)out.push({id:9003,at:m.breakEnd,title:'Break over',body:'Ready to focus again? Your session is waiting.'});return out}
+ if(!z.resumedAt)return out;const f=sessAt(z,now),left=z.plannedMs-f;
+ if(left>0)out.push({id:9001,at:now+left,title:'Focus session complete',body:'Well done. Open Focusy to log your time.'});
+ if(cfg.on&&m&&st==='idle'&&m.next>f&&z.plannedMs-m.next>5*6e4)out.push({id:9002,at:now+(m.next-f),title:'Time to move!',body:'Take a short walk, stretch, and refresh your mind.'});
+ return out}
 
 /* ===== Journey engine: pure, no DOM. Every position is a function of focus progress p (0..1), never of frames. ===== */
 const lerp=(a,b,t)=>a+(b-a)*t,clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -308,7 +346,7 @@ function load(){try{const j=JSON.parse(localStorage.getItem(K));if(j&&Array.isAr
  return{tasks:[],blocks:[],prio:{},set:{theme:'dark',weekStart:1},sess:null}}
 let S=load();
 function saveLocal(){try{localStorage.setItem(K,JSON.stringify(S));storeOK=true}catch(e){storeOK=false}}
-function save(){S.savedAt=Date.now();saveLocal();pushSoon()}
+function save(){S.savedAt=Date.now();saveLocal();pushSoon();try{window.FocusyNative&&FocusyNative.onSave(S.sess?notePlan(S.sess,Date.now(),MV()):[],S)}catch(e){}}
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
 const nowIso=()=>new Date().toISOString();
 const today=()=>ymd(new Date());
@@ -328,9 +366,12 @@ function toggle(id){const t=tById(id);if(!t)return;const was=t.status==='done';t
 const PAL=['#9b8cff','#4fd1c5','#f6ad55','#f687b3','#63b3ed','#9ae6b4','#fc8181','#d6bcfa'];
 const hue=id=>PAL[[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%PAL.length];
 const prog=t=>t.status==='done'?1:t.plan&&t.plan.estMin>0?Math.min(1,(t.plan.doneMin||0)/t.plan.estMin):0;
-const pline=t=>`<div class="pl" style="--c:${hue(t.id)}" role="progressbar" aria-label="Progress" aria-valuenow="${Math.round(prog(t)*100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prog(t)*100}%"></i></div>`;
+const pline=(t,c)=>`<div class="pl" style="--c:${c||hue(t.id)}" role="progressbar" aria-label="Progress" aria-valuenow="${Math.round(prog(t)*100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prog(t)*100}%"></i></div>`;
 const rowX=(t,ln,pl)=>{const nm=esc(t.title),dn=t.status==='done',ck=`<button class="ck" data-tog="${t.id}" aria-label="${dn?'Mark not done':'Mark done'}: ${nm}">${dn?'✓':''}</button>`;
- if(ln)return`<div class="row dcard s-${sev(t)}${dn?' dn':''}"><span class="ico" aria-hidden="true">${IC.book}</span><div class="rt" data-open="${t.id}" tabindex="0" role="button"><b>${nm}</b><div class="meta">${t.dueDate?`<small>${fd(t.dueDate)}</small>`:''}${badge(t)}</div>${pline(t)}</div>${ck}</div>`;
+ if(ln){const sv=sev(t),d=t.dueDate?daysLeft(t.dueDate):0,has=t.status==='done'||(t.plan&&t.plan.estMin>0),p=progPct(prog(t)),bd=progBand(p),C=119.38,
+  due=`${fd(t.dueDate)} · ${sv==='done'?'done':dueRel(d)}`,cat={emg:'Emergency',urg:'Urgent',upc:'Upcoming',safe:'Planned',done:'Done'}[sv]||'',
+  cap=has?`<span>${p}% completed</span> · <span class="rem">${100-p}% remaining</span>`:'No time estimate yet';
+  return`<div class="row dcard s-${sv}${dn?' dn':''}"><div class="rt" data-open="${t.id}" tabindex="0" role="button" aria-label="${nm}. ${cat}. Due ${due}. ${has?p+' percent complete':'No time estimate'}"><b>${nm}</b><span class="pill">${due}</span>${pline(t,has?bd.c:'#6b6788')}<small class="pcap">${cap}</small></div><div class="ring ${has?'g-'+bd.k:'g-n'}${p>=100?' p100':''}" data-open="${t.id}" aria-hidden="true" style="--gc:${has?bd.c:'#6b6788'}"><svg viewBox="0 0 48 48"><circle class="rd" cx="24" cy="24" r="19"/><circle class="rb" cx="24" cy="24" r="19"/>${has&&p>0?`<circle class="rf" cx="24" cy="24" r="19" stroke-dasharray="${(p/100*C).toFixed(2)} ${C}"/>`:''}</svg><span>${p}%</span></div>${ck}</div>`}
  return`<div class="row${dn?' dn':''}">${ck}<div class="rt" data-edit="${t.id}" tabindex="0" role="button"><b>${nm}</b>${t.notes?`<small>${esc(t.notes.slice(0,80))}</small>`:''}</div>${pl?`<button class="pb2" data-act="focustask" data-id="${t.id}" aria-label="Start focus: ${nm}">${PLAY}</button>`:''}${badge(t)}</div>`};
 const row=t=>rowX(t,0);
 const btitle=b=>b.type==='break'?(b.title||'Break'):(tById(b.taskId)?.title||b.title||'Task');
@@ -546,7 +587,7 @@ function sndCard(){const q=SND(),m=MV();
  <div class="btns"><button class="btn g" data-act="testsnd" data-k="done">Test completion</button><button class="btn g" data-act="testsnd" data-k="move">Test movement</button></div>
  <label class="sw"><input type="checkbox" data-p="mv.on" ${m.on?'checked':''}> Movement reminders</label>
  <div class="grid2"><div><label for="s-ev">Remind me every</label><select id="s-ev" data-p="mv.every">${opts([20,30,40,50,60].map(x=>[x,x+' min of focus']),m.every)}</select></div><div><label for="s-bs">Break length</label><select id="s-bs" data-p="mv.breakSec">${opts([[30,'30 seconds'],[60,'1 minute'],[120,'2 minutes'],[180,'3 minutes']],m.breakSec)}</select></div></div>
- ${'Notification' in window?`<div class="btns"><button class="btn g" data-act="notifperm">${Notification.permission==='granted'?'✓ Notifications on':'Enable notifications'}</button></div>`:''}
+ ${window.FocusyNative&&FocusyNative.native?`<div class="btns"><button class="btn g" data-act="notifperm">${FocusyNative.perm==='granted'?'✓ Notifications on':'Enable notifications'}</button></div>`:'Notification' in window?`<div class="btns"><button class="btn g" data-act="notifperm">${Notification.permission==='granted'?'✓ Notifications on':'Enable notifications'}</button></div>`:''}
  <small style="margin-top:10px">Sound plays while Focusy is open, including in the background. Phones can't alert you when the app is fully closed or the device is locked; timers catch up the next time you open it. Sound settings stay on this device.</small></div>`}
 /* ---------- Focus timer: all time derived from timestamps, so minimizing or locking the device never drifts ---------- */
 let tmr={open:false,done:null,adj:false},wlk=null;const TC=2*Math.PI*124;
@@ -587,7 +628,7 @@ function tickTimer(){const z=S.sess,tt=$('#tt'),tf=$('#tf');if(!z||!tt)return;co
  const left=z.plannedMs-sessMs(z);tt.textContent=clock(left);if(tf)tf.style.strokeDashoffset=TC*Math.min(1,Math.max(0,1-left/z.plannedMs));jrHud(jview())}
 function pillUpd(){const z=S.sess,e=$('#pill');if(!z||tmr.open){e.style.display='none';return}const t=tById(z.taskId),m=z.mv&&z.mv.state;e.style.display='block';
  e.innerHTML=`<button data-act="topen" aria-label="Open focus timer">${m==='break'?'Movement break · '+clock(z.mv.breakEnd-Date.now()):m==='ready'?'Ready to resume · '+esc(t?t.title:'Focus'):esc(t?t.title:'Focus')+' · '+clock(z.plannedMs-sessMs(z))}</button>`}
-async function wl(){try{const need=tmr.open&&S.sess&&S.sess.resumedAt;if(need&&!wlk&&navigator.wakeLock){wlk=await navigator.wakeLock.request('screen');wlk.addEventListener('release',()=>{wlk=null})}else if(!need&&wlk){await wlk.release();wlk=null}}catch(e){}}
+async function wl(){try{const need=tmr.open&&S.sess&&S.sess.resumedAt;try{window.FocusyNative&&FocusyNative.awake(!!need)}catch(e){}if(need&&!wlk&&navigator.wakeLock){wlk=await navigator.wakeLock.request('screen');wlk.addEventListener('release',()=>{wlk=null})}else if(!need&&wlk){await wlk.release();wlk=null}}catch(e){}}
 function setPlanned(m){const z=S.sess,b=S.blocks.find(x=>x.id===z.blockId);if(jmode()&&JNY().anim)jr.blend={from:jr.pd,t0:performance.now()};z.plannedMs=Math.max(Math.ceil(sessMs(z)/6e4)+1,m)*6e4;if(b&&b.adhoc)b.endAt=new Date(+new Date(b.startAt)+z.plannedMs).toISOString();save();renderTimer()}
 /* ---------- Journey view: the focus timer as a night-time mountain journey. Every position comes from real focus time (sessMs), never from frame counts. ---------- */
 const JNY=()=>({on:true,anim:!matchMedia('(prefers-reduced-motion: reduce)').matches,...S.set.jny});
@@ -668,7 +709,7 @@ const ACT={
  tundo(){const d=tmr.done;if(d&&d.undo){d.undo();d.undo=null;d.m=0;d.undone=true;renderTimer()}},
  jreplay(){jrReplay(false)},
  testsnd(d){play(d.k==='move'?'move':'done',true)},
- notifperm(){try{Notification.requestPermission().then(()=>render())}catch(e){}},
+ notifperm(){try{if(window.FocusyNative&&FocusyNative.native)FocusyNative.ask().then(()=>render());else Notification.requestPermission().then(()=>render())}catch(e){}},
  review(d){reviewModal(d.id)},logwork(d){logModal('',d.t)},blockdone(d){logModal(d.id)},
  applyplan(d){const t=tById(d.id),r=t&&applyFor(t);if(!r)return;save();closeSheet();render();if(curD)detailModal(curD);toast(r.ids.length+' session(s) added to Focus')},
  focusnow(d){startFocus({taskId:d.id})},focustask(d){startFocus({taskId:d.id,min:+d.m||0})},startblock(d){startFocus({blockId:d.id})},
@@ -750,7 +791,7 @@ document.addEventListener('change',e=>{const pp=e.target.dataset.p;if(pp){const[
 function render(){
  const r=document.documentElement;S.set.theme==='auto'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',S.set.theme);
  $('#nav').innerHTML=BRAND+V.map(([k,l,i])=>`<button class="nv${k===view?' on':''}${k==='one'?' hm':''}" data-nav="${k}" ${k===view?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}</button>`).join('');
- const mm=$('#main'),ch=mm.dataset.v!==view;mm.dataset.v=view;mm.classList.toggle('enter',ch);mm.innerHTML=VIEWS[view]();lastNow='';setLogo()}
+ document.body.dataset.v=view;const mm=$('#main'),ch=mm.dataset.v!==view;mm.dataset.v=view;mm.classList.toggle('enter',ch);mm.innerHTML=VIEWS[view]();lastNow='';setLogo()}
 /* live clock: real device time, no offsets; re-evaluates every second, on resume, and on date change */
 let lastMin=-1,lastDay=today(),lastNow='';
 function tick(){checkDone();mvTick();{const z=S.sess;if(z){const l=z.mv&&z.mv.state==='break'?z.mv.breakEnd-Date.now():z.resumedAt?z.plannedMs-sessMs(z):1e9;if(l>0&&l<1100)setTimeout(()=>{checkDone();mvTick();if(S.sess)tickTimer()},l+10)}}if(S.sess){tickTimer();pillUpd()}if(jmode()&&!jr.raf){const v=jview();if(v&&v.st==='run')jrDraw()}const n=new Date(),c=$('#clk');if(c)c.textContent=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
