@@ -41,7 +41,7 @@ textarea{min-height:70px;resize:vertical}label{display:block;font-size:12.5px;co
 .blk{display:flex;gap:14px;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--acc);border-radius:14px;padding:12px 14px;margin:8px 0;cursor:pointer}
 .blk.brk{border-left-color:var(--safe)}.blk.cur{background:var(--accs);box-shadow:0 0 0 2px var(--acc)}
 .bt{width:78px;font-weight:700;font-variant-numeric:tabular-nums;flex:none}.bb{flex:1;min-width:0}
-.warn{color:var(--urg);font-weight:600}.nowt{color:var(--acc);font-weight:700}
+.warn{color:var(--emg);font-weight:600}.nowt{color:var(--acc);font-weight:700}
 .empty{text-align:center;color:var(--mut);padding:20px 8px}
 .days{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.day{cursor:pointer;margin:0}.day.t{box-shadow:0 0 0 2px var(--acc)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
@@ -183,21 +183,35 @@ body[data-v="deadlines"] #fab{display:none}
 .pill{display:inline-block;max-width:100%;margin-top:6px;padding:3px 10px;border-radius:99px;font-size:12px;line-height:1.4;font-weight:500;color:var(--tx);background:color-mix(in srgb,var(--sc) 20%,transparent);border:1px solid color-mix(in srgb,var(--sc) 48%,transparent);overflow-wrap:anywhere}
 .dcard .pl{margin-top:9px}
 .pcap{display:block;margin-top:6px;font-size:12px;line-height:1.35;color:var(--mut)}
-.ring{position:relative;width:54px;height:54px;flex:none;display:grid;place-items:center;cursor:pointer}
-.ring::before{content:"";position:absolute;inset:-7px;border-radius:50%;background:radial-gradient(circle,var(--gc) 0%,transparent 66%);opacity:.3;pointer-events:none}
-.ring svg{position:relative;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
-.ring circle{fill:none;stroke-width:3.4}
-.ring .rd{fill:#16112f;stroke:none}.ring .rb{stroke:rgba(255,255,255,.12)}
-.ring .rf{stroke:var(--gc);stroke-linecap:round;filter:drop-shadow(0 0 3px var(--gc))}
-.ring span{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;text-shadow:none}
-.ring.p100 span{font-size:13px}
-.ring.g-n::before{opacity:0}.ring.g-n .rf{filter:none}
-.ring.g-n span{color:rgba(255,255,255,.7)}
+.dring{position:relative;width:54px;height:54px;flex:none;display:grid;place-items:center;cursor:pointer}
+.dring::before{content:"";position:absolute;inset:-7px;border-radius:50%;background:radial-gradient(circle,var(--gc) 0%,transparent 66%);opacity:.3;pointer-events:none}
+.dring svg{position:relative;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.dring circle{fill:none;stroke-width:3.4}
+.dring .rd{fill:#16112f;stroke:none}.dring .rb{stroke:rgba(255,255,255,.12)}
+.dring .rf{stroke:var(--gc);stroke-linecap:round;filter:drop-shadow(0 0 3px var(--gc))}
+.dring span{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;text-shadow:none}
+.dring.p100 span{font-size:13px}
+.dring.g-n::before{opacity:0}.dring.g-n .rf{filter:none}
+.dring.g-n span{color:rgba(255,255,255,.7)}
 @media(prefers-reduced-motion:no-preference){
- .ring:not(.g-p):not(.g-n)::before{animation:breathe 3.6s ease-in-out infinite}
+ .dring:not(.g-p):not(.g-n)::before{animation:breathe 3.6s ease-in-out infinite}
  .dcard .pl i{transition:width .9s ease}}
 @keyframes breathe{0%,100%{opacity:.22;transform:scale(.96)}50%{opacity:.5;transform:scale(1.06)}}
-@media(max-width:350px){.ring{width:48px;height:48px}.ring span{font-size:13px}.ring.p100 span{font-size:11.5px}.row.dcard{gap:9px;padding:11px 12px}}
+@media(max-width:350px){.dring{width:48px;height:48px}.dring span{font-size:13px}.dring.p100 span{font-size:11.5px}.row.dcard{gap:9px;padding:11px 12px}}
+
+/* ===== Overlapping blocks (Focus) and plan preview (task form) ===== */
+.ovg{margin:10px 0 10px -9px;padding:8px 9px 4px;border:1px solid rgba(239,68,68,.6);border-radius:20px;background:rgba(239,68,68,.07)}
+.ovh{color:var(--emg);font-size:12.5px;font-weight:600;padding:2px 4px 4px 12px}
+.blk.ov .bc{border-color:rgba(239,68,68,.75);box-shadow:0 0 0 1px rgba(239,68,68,.35)}.blk.ov::before{background:var(--emg)}
+.plprev{margin:10px 0 2px;padding:10px 12px;border-radius:14px;background:var(--card2);border:1px solid var(--bd)}.plprev small{display:block;margin-top:4px;line-height:1.4}
+.pvh{font-size:15px}.pvh b{color:var(--acc)}
+.pvl{list-style:none;margin:8px 0 2px;padding:0;display:grid;gap:5px}.pvl li{display:flex;align-items:center;gap:10px;font-size:13px}.pvl li span:first-child{flex:1;color:var(--mut)}.pvl li b{font-variant-numeric:tabular-nums}
+
+.pvl li{display:block}.pvr{display:flex;align-items:center;gap:10px}.pvr span:first-child{flex:1;min-width:0}.pvt{font-size:12px;color:var(--mut);white-space:nowrap}
+.pvc{font-size:12px;line-height:1.35;margin:2px 0 4px;overflow-wrap:anywhere}
+.pvf{margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)}.pvch{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px}
+.pvs{min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--pri);background:color-mix(in srgb,var(--pri) 18%,transparent);color:var(--tx);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.pvo{display:block;min-height:36px;padding:0;margin-top:4px;text-align:left}
 
 /* ===== Focusy Journey ===== */
 #timer.jm{padding:0;gap:0;justify-content:flex-start;align-items:stretch;background:#0b0820}
@@ -238,12 +252,12 @@ const DEFP={estMin:0,doneMin:0,target:'',days:[1,2,3,4,5],start:'18:00',sessionM
 const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 /* Finish-by date: the user's own, clamped to the deadline; else deadline minus a buffer (3 days if Important, else 2). Never later than the deadline. */
 function effTarget(t,td){const p=t.plan||{};if(p.target&&p.target<=t.dueDate)return p.target;const e=addDays(t.dueDate,t.important===true?-3:-2);return e<td?td:e}
-function slot(ds,dur,start,taken,now){for(let sh=0;sh<=180;sh+=15){const s=at(ds,start,sh),e=new Date(+s+dur*6e4);
+function slot(ds,dur,start,taken,now,force){for(let sh=0;sh<=180;sh+=15){const s=at(ds,start,sh),e=new Date(+s+dur*6e4);
  if(ymd(s)!==ds||ymd(e)!==ds||s<=now)continue;
- if(!taken.some(o=>+new Date(o.startAt)<+e&&+s<+new Date(o.endAt)))return s}return null}
+ if(force||!taken.some(o=>+new Date(o.startAt)<+e&&+s<+new Date(o.endAt)))return s}return null}
 function collect(p,from,to,dur,taken,now){const out=[];let skipped=0;for(let d=from;d<=to;d=addDays(d,1)){
- if(!p.days.includes(new Date(d+'T00:00').getDay()))continue;const s=slot(d,dur,p.start,taken,now);
- if(s)out.push({date:d,startAt:s,endAt:new Date(+s+dur*6e4)});else skipped++}return{out,skipped}}
+ if(!p.days.includes(new Date(d+'T00:00').getDay()))continue;let s=slot(d,dur,p.start,taken,now),ov=false;if(!s){s=slot(d,dur,p.start,taken,now,true);ov=!!s}
+ if(s)out.push({date:d,startAt:s,endAt:new Date(+s+dur*6e4),ov});else skipped++}return{out,skipped}}
 /* Rule-based planner. Pure: same inputs, same plan. Never edits the deadline or any block. */
 function planCalc(t,blocks,now){
  const p=t.plan;if(!p||!(p.estMin>0)||!t.dueDate)return null;
@@ -267,14 +281,15 @@ function planCalc(t,blocks,now){
  const dates=picks.map(x=>x.date).concat(keep.map(b=>ymd(new Date(b.endAt)))).sort(),est=rem===0?null:(late||dates[dates.length-1]||null);
  const atRisk=rem>0&&(short>0||(need>0&&!picks.length)||dur>p.sessionMin||t.dueDate<td);
  if(keep.length)R.push(`${keep.length} manual session(s) already cover ${fmt(keepMin)} and are kept exactly as they are.`);
- if(skipped)R.push(`${skipped} workday(s) skipped because your calendar was busy.`);
+ const ovn=picks.filter(x=>x.ov).length;if(ovn)R.push(`${ovn} session(s) overlap another block. They are still planned and shown in red in Focus, so nothing is hidden. Move one if you prefer.`);
+ if(skipped)R.push(`${skipped} workday(s) skipped because the preferred time had already passed.`);
  if(missed)R.push(`${missed} earlier session(s) were missed. They don't count as progress, so the work is spread over the days that are left.`);
  if(dur>p.sessionMin&&short===0)R.push(`Not enough workdays at ${p.sessionMin} min, so sessions are lengthened to ${fmt(dur)}.`);
  if(short>0)R.push(`Even at full capacity ${fmt(short)} would remain by ${tgt}. At this pace you would finish around ${late}.${late>t.dueDate?' That is after your deadline.':''} Add workdays or time, or review the estimate. The deadline is not changed.`);
  if(t.dueDate<td&&rem>0)R.push('The deadline has passed. Nothing is moved automatically.');
  if(!atRisk&&picks.length&&est)R.push(`${picks.length} session(s) spread over your workdays finish ${est}, ${dayNum(t.dueDate)-dayNum(est)} day(s) before the deadline.`);
  const weeks=Math.max(1,(dayNum(tgt)-dayNum(td)+1)/7);
- return{rem,pct,tgt,keep,drop,picks,recMin:dur,perWeek:picks.length?Math.min(p.days.length,Math.max(1,Math.ceil(picks.length/weeks))):0,est,atRisk,short,missed,skipped,reasons:R}}
+ return{rem,pct,tgt,keep,drop,picks,recMin:dur,perWeek:picks.length?Math.min(p.days.length,Math.max(1,Math.ceil(picks.length/weeks))):0,est,atRisk,short,missed,skipped,overlap:ovn,reasons:R}}
 /* Planned sessions whose time has passed without being logged become "missed" (and flag the plan as outdated). */
 function sweepMissed(S,now){let n=0;for(const b of S.blocks){const t=S.tasks.find(x=>x.id===b.taskId&&!x.deletedAt);
  if(t&&t.plan&&t.plan.estMin>0&&b.type!=='break'&&(!b.status||b.status==='planned')&&new Date(b.endAt)<now){b.status='missed';t.plan.stale=true;n++}}return n}
@@ -371,7 +386,7 @@ const rowX=(t,ln,pl)=>{const nm=esc(t.title),dn=t.status==='done',ck=`<button cl
  if(ln){const sv=sev(t),d=t.dueDate?daysLeft(t.dueDate):0,has=t.status==='done'||(t.plan&&t.plan.estMin>0),p=progPct(prog(t)),bd=progBand(p),C=119.38,
   due=`${fd(t.dueDate)} · ${sv==='done'?'done':dueRel(d)}`,cat={emg:'Emergency',urg:'Urgent',upc:'Upcoming',safe:'Planned',done:'Done'}[sv]||'',
   cap=has?`<span>${p}% completed</span> · <span class="rem">${100-p}% remaining</span>`:'No time estimate yet';
-  return`<div class="row dcard s-${sv}${dn?' dn':''}"><div class="rt" data-open="${t.id}" tabindex="0" role="button" aria-label="${nm}. ${cat}. Due ${due}. ${has?p+' percent complete':'No time estimate'}"><b>${nm}</b><span class="pill">${due}</span>${pline(t,has?bd.c:'#6b6788')}<small class="pcap">${cap}</small></div><div class="ring ${has?'g-'+bd.k:'g-n'}${p>=100?' p100':''}" data-open="${t.id}" aria-hidden="true" style="--gc:${has?bd.c:'#6b6788'}"><svg viewBox="0 0 48 48"><circle class="rd" cx="24" cy="24" r="19"/><circle class="rb" cx="24" cy="24" r="19"/>${has&&p>0?`<circle class="rf" cx="24" cy="24" r="19" stroke-dasharray="${(p/100*C).toFixed(2)} ${C}"/>`:''}</svg><span>${p}%</span></div>${ck}</div>`}
+  return`<div class="row dcard s-${sv}${dn?' dn':''}"><div class="rt" data-open="${t.id}" tabindex="0" role="button" aria-label="${nm}. ${cat}. Due ${due}. ${has?p+' percent complete':'No time estimate'}"><b>${nm}</b><span class="pill">${due}</span>${pline(t,has?bd.c:'#6b6788')}<small class="pcap">${cap}</small></div><div class="dring ${has?'g-'+bd.k:'g-n'}${p>=100?' p100':''}" data-open="${t.id}" aria-hidden="true" style="--gc:${has?bd.c:'#6b6788'}"><svg viewBox="0 0 48 48"><circle class="rd" cx="24" cy="24" r="19"/><circle class="rb" cx="24" cy="24" r="19"/>${has&&p>0?`<circle class="rf" cx="24" cy="24" r="19" stroke-dasharray="${(p/100*C).toFixed(2)} ${C}"/>`:''}</svg><span>${p}%</span></div>${ck}</div>`}
  return`<div class="row${dn?' dn':''}">${ck}<div class="rt" data-edit="${t.id}" tabindex="0" role="button"><b>${nm}</b>${t.notes?`<small>${esc(t.notes.slice(0,80))}</small>`:''}</div>${pl?`<button class="pb2" data-act="focustask" data-id="${t.id}" aria-label="Start focus: ${nm}">${PLAY}</button>`:''}${badge(t)}</div>`};
 const row=t=>rowX(t,0);
 const btitle=b=>b.type==='break'?(b.title||'Break'):(tById(b.taskId)?.title||b.title||'Task');
@@ -425,8 +440,8 @@ focus(){
  const all=dayBlocks(fdate),tot=all.reduce((a,b)=>a+Math.round((new Date(b.endAt)-new Date(b.startAt))/6e4),0),dl=new Date(fdate+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
  return`<div class="top"><h1>Focus</h1><button class="btn" data-act="newblock">+ Add block</button></div>
  <div class="dnav"><button data-act="fprev" aria-label="Previous day">${svg(IC.chev.match(/<path[^>]*>/)[0].replace('M9 5l7 7-7 7','M15 5l-7 7 7 7'),18)}</button><button class="dpill" data-act="ftoday" aria-label="Jump to today">${fdate===today()?'Today · ':''}${dl}</button><button data-act="fnext" aria-label="Next day">${IC.chev}</button></div>
- <small>${all.length} blocks · ${Math.floor(tot/60)}h ${tot%60}m planned · 15-minute grid</small>
- ${all.length?`<div class="tl">${all.map(b=>bcard(b,all)).join('')}</div>`:`<div class="card">${emp(IC.timer,'No blocks yet','Add one to start your timeline.')}</div>`}`},
+ <small>${all.length} blocks · ${Math.floor(tot/60)}h ${tot%60}m planned · 15-minute grid${ovCount(all)?` · <span class="warn">⚠ ${ovCount(all)} overlapping</span>`:''}</small>
+ ${all.length?`<div class="tl">${ovRender(all)}</div>`:`<div class="card">${emp(IC.timer,'No blocks yet','Add one to start your timeline.')}</div>`}`},
 deadlines(){
  const L=open().filter(t=>t.dueDate),c={emg:0,urg:0,upc:0,safe:0};L.forEach(t=>c[sev(t)]++);
  const dn=live().filter(t=>t.status==='done'&&t.dueDate).length,col={emg:'var(--emg)',urg:'var(--urg)',upc:'var(--upc)',safe:'var(--safe)',done:'var(--done)'};
@@ -464,9 +479,15 @@ more(){
 function oneBody(p){const t=tById(p.taskId),h=span(p.start,p.end)/60;
  return`<b>${esc(t?t.title:'(task removed)')}</b>${p.purpose?`<small>Why: ${esc(p.purpose)}</small>`:''}${p.start&&p.end?`<small>${hm(p.start)} – ${hm(p.end)} · ${+h.toFixed(1)}h</small>`:''}<small class="nowt">${{ns:'Not started',ip:'In progress',dn:'Done'}[p.status]||'Not started'}</small>`}
 function dayBlocks(ds){const a=+new Date(ds+'T00:00'),b=+new Date(addDays(ds,1)+'T00:00');return S.blocks.filter(x=>+new Date(x.startAt)<b&&+new Date(x.endAt)>a).sort((p,q)=>p.startAt<q.startAt?-1:1)}
+function ovGroups(all){const a=[...all].sort((p,q)=>p.startAt<q.startAt?-1:p.startAt>q.startAt?1:0),out=[];let i=0;
+ while(i<a.length){let j=i,end=+new Date(a[i].endAt);while(j+1<a.length&&+new Date(a[j+1].startAt)<end){j++;end=Math.max(end,+new Date(a[j].endAt))}
+  const g=a.slice(i,j+1);out.push(g);i=j+1}return out}
+const ovCount=all=>ovGroups(all).filter(g=>g.length>1).reduce((n,g)=>n+g.length,0);
+function ovRender(all){return ovGroups(all).map(g=>{if(g.length<2)return bcard(g[0],all);const e=Math.max(...g.map(b=>+new Date(b.endAt)));
+ return`<div class="ovg" role="group" aria-label="${g.length} overlapping blocks"><div class="ovh">⚠ ${g.length} blocks overlap · ${tf(new Date(g[0].startAt))} – ${tf(new Date(e))}</div>${g.map(b=>bcard(b,all)).join('')}</div>`}).join('')}
 function bcard(b,all){const s=new Date(b.startAt),e=new Date(b.endAt),n=Date.now(),cur=+s<=n&&n<+e,
  ov=all.some(o=>o!==b&&+new Date(o.startAt)<+e&&+s<+new Date(o.endAt));
- return`<div class="blk${cur?' cur':''}${b.type==='break'?' brk':''}" data-act="editblock" data-id="${b.id}" tabindex="0" role="button"><div class="bt">${tf(s)}<small>${tf(e)}</small></div><div class="bc"><span class="bi" aria-hidden="true">${b.type==='break'?IC.cup:IC.book}</span><div class="bb"><b>${esc(btitle(b))}</b><small>${Math.round((e-s)/6e4)} min${ymd(e)!==ymd(s)?' · ends next day':''}${cur?' · <span class="nowt">NOW</span>':''}${ov?' · <span class="warn">⚠ overlaps another block</span>':''}${b.status==='done'?' · ✓ done'+(b.workedMin!==undefined?' ('+b.workedMin+' min)':''):''}${b.status==='missed'?' · <span class="warn">missed</span>':''}${b.auto?' · Smart':''}</small></div>${(()=>{const k=tById(b.taskId);return k&&k.plan&&k.plan.estMin&&b.type!=='break'&&b.status!=='done'?`<button class="btn g" style="min-height:40px;padding:6px 12px;align-self:center" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''})()}</div></div>`}
+ return`<div class="blk${cur?' cur':''}${b.type==='break'?' brk':''}${ov?' ov':''}" data-act="editblock" data-id="${b.id}" tabindex="0" role="button"><div class="bt">${tf(s)}<small>${tf(e)}</small></div><div class="bc"><span class="bi" aria-hidden="true">${b.type==='break'?IC.cup:IC.book}</span><div class="bb"><b>${esc(btitle(b))}</b><small>${Math.round((e-s)/6e4)} min${ymd(e)!==ymd(s)?' · ends next day':''}${cur?' · <span class="nowt">NOW</span>':''}${ov?' · <span class="warn">⚠ Overlap</span>':''}${b.status==='done'?' · ✓ done'+(b.workedMin!==undefined?' ('+b.workedMin+' min)':''):''}${b.status==='missed'?' · <span class="warn">missed</span>':''}${b.auto?' · Smart':''}</small></div>${(()=>{const k=tById(b.taskId);return k&&k.plan&&k.plan.estMin&&b.type!=='break'&&b.status!=='done'?`<button class="btn g" style="min-height:40px;padding:6px 12px;align-self:center" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''})()}</div></div>`}
 function dlist(){let L=live().filter(t=>t.dueDate);const q=dlq.toLowerCase();
  if(q)L=L.filter(t=>(t.title+' '+t.notes).toLowerCase().includes(q));
  L=L.filter(t=>dlf==='all'?t.status!=='done':sev(t)===dlf);
@@ -483,6 +504,7 @@ function taskModal(id,pre){const t=id?tById(id):{title:'',notes:'',important:nul
  modal(id?'Edit task':'New task',`<label for="m-t">Task</label><input id="m-t" value="${esc(t.title)}" placeholder="What needs doing?">
  <label for="m-d">Deadline</label><input type="date" id="m-d" value="${t.dueDate||''}">
  <label>Estimated work</label><div class="pair"><input type="number" id="pl-h" min="0" placeholder="hours" value="${h||''}" aria-label="Estimated hours"><input type="number" id="pl-m" min="0" max="59" step="5" placeholder="minutes" value="${m||''}" aria-label="Estimated minutes"></div>
+ <div class="plprev" id="pl-prev" aria-live="polite"></div>
  <details class="mo"><summary>More options</summary>
  <div class="grid2"><div><label for="m-i">Important?</label><select id="m-i">${triOpts(t.important)}</select></div><div><label for="m-u">Urgent?</label><select id="m-u">${triOpts(t.urgent)}</select></div></div>
  <label for="m-s">Scheduled day</label><input type="date" id="m-s" value="${t.scheduledDate||''}">
@@ -493,7 +515,29 @@ function taskModal(id,pre){const t=id?tById(id):{title:'',notes:'',important:nul
  <div class="grid2"><div><label for="pl-s">Preferred start</label><select id="pl-s">${opts(slots,p.start)}</select></div><div><label for="pl-l">Longest session</label><select id="pl-l">${opts([30,45,60,90,120,180].map(x=>[x,x+' min']),p.sessionMin)}</select></div></div>
  <label for="pl-o">Scheduling</label><select id="pl-o">${opts([['auto','Automatic: plan sessions for me'],['manual','Manual: I schedule sessions myself']],p.mode)}</select></details>
  <div class="err" id="merr"></div>
- <div class="btns"><button class="btn" data-act="savetask" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${id?`<button class="btn r" data-act="deltask" data-id="${id}">Delete</button>`:''}</div>`)}
+ <div class="btns"><button class="btn" data-act="savetask" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${id?`<button class="btn r" data-act="deltask" data-id="${id}">Delete</button>`:''}</div>`);planPreview()}
+/* Live preview in the task form: how much time per day the planner will ask for, using the same planner that creates the sessions. */
+function planPreview(){const el0=$('#pl-prev');if(!el0)return;const el={set innerHTML(h){if(el0._h!==h){el0._h=h;el0.innerHTML=h}}};const due=$('#m-d').value,g=i=>+($(i).value)||0,est=g('#pl-h')*60+g('#pl-m');
+ if(!est){el.innerHTML='<small>Enter your estimated work to see how much time you need each day.</small>';return}
+ if(!due){el.innerHTML='<small>Add a deadline to see your time per day.</small>';return}
+ const pl=readPlan(due);if(!pl||pl.err){el.innerHTML=`<small class="warn">${pl&&pl.err?esc(pl.err):''}</small>`;return}
+ if(pl.mode==='manual'){el.innerHTML='<small>Manual scheduling: nothing is planned for you. You add your own sessions.</small>';return}
+ const sb=$('#modal [data-act="savetask"]'),id=sb&&sb.dataset.id,t={id:id||'__new',dueDate:due,important:unt($('#m-i').value),plan:{...DEFP,...pl}},c=planCalc(t,S.blocks,new Date());
+ if(!c){el.innerHTML='';return}
+ if(c.rem===0){el.innerHTML='<small>Nothing left to plan: the work done already covers the estimate.</small>';return}
+ const items=c.picks.map(x=>({d:x.date,m:Math.round((x.endAt-x.startAt)/6e4),ov:x.ov,s:x.startAt,e:x.endAt})),mine=b=>id&&b.taskId===id&&b.auto,now=new Date();
+ const hits=(st,en)=>S.blocks.filter(b=>!mine(b)&&b.status!=='missed'&&+new Date(b.startAt)<+en&&+st<+new Date(b.endAt));
+ const cnames=x=>{const h=hits(x.s,x.e),n=[...new Set(h.map(b=>`${esc(btitle(b))} ${tf(new Date(b.startAt))}–${tf(new Date(b.endAt))}`))];return n.slice(0,2).join(', ')+(n.length>2?` +${n.length-2} more`:'')};
+ let free='';if(c.overlap){const cur=(pl.start||'18:00').split(':').map(Number),cm=cur[0]*60+cur[1],ok=slots.map(q=>q[0]).filter(v=>v>='06:00'&&v<='21:45').filter(v=>{const c2=planCalc({...t,plan:{...t.plan,start:v}},S.blocks,now);return c2&&!c2.overlap&&c2.picks.length>0}).sort((a,b)=>Math.abs(+a.slice(0,2)*60+ +a.slice(3)-cm)-Math.abs(+b.slice(0,2)*60+ +b.slice(3)-cm)).slice(0,4);
+  free=ok.length?`<div class="pvf"><small>Free on all these days. Tap to start then:</small><div class="pvch">${ok.map(v=>`<button type="button" class="pvs" data-act="pvstart" data-t="${v}">${hm(v)}</button>`).join('')}</div><button type="button" class="lnk pvo" data-act="pvopen">Or change the start time below ↓</button></div>`:`<div class="pvf"><small>No single start time is free on every day. Try a shorter session, other workdays, or move the other block.</small><button type="button" class="lnk pvo" data-act="pvopen">Change start time and sessions below ↓</button></div>`}
+ if(!items.length){el.innerHTML=`<div class="pvh warn">⚠ No workday available before ${fd(c.tgt)}</div><small>Your deadline stays ${fd(due)}. Pick more workdays, start earlier, or lower the estimate.</small>`;return}
+ const tot=items.reduce((a,x)=>a+x.m,0),avg=Math.round(tot/items.length/5)*5||tot,show=items.slice(0,6);
+ el.innerHTML=`<div class="pvh">About <b>${fmt(avg)}</b> a day · ${items.length} day${items.length>1?'s':''}</div>
+ <small>${fd(items[0].d)}${items.length>1?' – '+fd(items[items.length-1].d):''} · finish by ${fd(c.tgt)} · deadline ${fd(due)} unchanged</small>
+ <ul class="pvl">${show.map(x=>`<li><div class="pvr"><span>${new Date(x.d+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span><span class="pvt">${tf(x.s)} – ${tf(x.e)}</span><b>${fmt(x.m)}</b></div>${x.ov?`<div class="pvc warn">⚠ overlaps ${cnames(x)||'another block'}</div>`:''}</li>`).join('')}${items.length>show.length?`<li class="mut">+ ${items.length-show.length} more day${items.length-show.length>1?'s':''}</li>`:''}</ul>
+ ${c.overlap?`<small class="warn">⚠ ${c.overlap} session${c.overlap>1?'s':''} overlap another block. They are still planned and shown in red in Focus.</small>`:''}${free}
+ ${c.short>0||due<ymd(new Date())?`<small class="warn">⚠ ${esc(c.reasons.filter(r=>/Even at full|passed/.test(r)).join(' ')||'This plan is tight.')}</small>`:c.reasons.some(r=>/Not enough workdays/.test(r))?`<small>${esc(c.reasons.find(r=>/Not enough workdays/.test(r)))}</small>`:''}`}
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if($('#pl-prev')&&e.target.closest&&e.target.closest('#modal'))planPreview()}));
 function blockModal(id){const b=id?S.blocks.find(x=>x.id===id):null,s=b?new Date(b.startAt):(()=>{const d=new Date();d.setMinutes(Math.ceil((d.getMinutes()+1)/15)*15,0,0);return d})();
  const sv=pad(s.getHours())+':'+pad(s.getMinutes()),dur=b?Math.round((new Date(b.endAt)-s)/6e4):30;
  modal(b?'Edit block':'New time block',`<label for="b-y">Type</label><select id="b-y">${opts([['task','Task'],['break','Break']],b?b.type:'task')}</select>
@@ -709,6 +753,8 @@ const ACT={
  tundo(){const d=tmr.done;if(d&&d.undo){d.undo();d.undo=null;d.m=0;d.undone=true;renderTimer()}},
  jreplay(){jrReplay(false)},
  testsnd(d){play(d.k==='move'?'move':'done',true)},
+ pvstart(d){const e=$('#pl-s');if(e){e.value=d.t;e.dispatchEvent(new Event('change',{bubbles:true}))}},
+ pvopen(){const m=document.querySelector('#modal details.mo'),e=$('#pl-s');if(m)m.open=true;if(e){e.scrollIntoView({block:'center'});e.focus()}},
  notifperm(){try{if(window.FocusyNative&&FocusyNative.native)FocusyNative.ask().then(()=>render());else Notification.requestPermission().then(()=>render())}catch(e){}},
  review(d){reviewModal(d.id)},logwork(d){logModal('',d.t)},blockdone(d){logModal(d.id)},
  applyplan(d){const t=tById(d.id),r=t&&applyFor(t);if(!r)return;save();closeSheet();render();if(curD)detailModal(curD);toast(r.ids.length+' session(s) added to Focus')},
