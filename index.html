@@ -66,7 +66,9 @@ details>summary{cursor:pointer;min-height:40px;padding:8px 0;color:var(--acc);fo
 .pop{position:absolute;top:56px;right:14px;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh);padding:6px;z-index:3;min-width:200px}
 .pop button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--tx);font:inherit;padding:12px;min-height:44px;border-radius:10px;cursor:pointer}.pop .dng{color:var(--emg)}
 .big{width:100%;min-height:54px;font-size:17px;border-radius:16px}
-.acts{display:flex;gap:10px;margin-top:12px}
+.lk{color:#ffd37a}.mvd{display:block;color:#9fd0ff}.mvd a{color:#c8b6ff;margin-left:6px}.pvm{border-left:3px solid #8b6cff;padding-left:8px}.bact{display:flex;gap:6px;align-items:center;align-self:center;flex:0 0 auto}.bact .btn{min-height:40px;padding:6px 10px;font-size:14px}.play{flex:0 0 40px;width:40px;height:40px;min-width:40px;border-radius:50%;border:0;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#8b6cff,#5b3fe0);box-shadow:0 0 14px rgba(124,92,255,.45);cursor:pointer}.play svg{width:18px;height:18px;margin-left:2px}.play:active{transform:scale(.94)}.play:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.acts{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.acts>button{flex:1 1 40%}
+.chk{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px}.chk input{width:auto}.pvx{margin-top:8px;padding:10px;border-radius:12px;border:1px solid var(--emg);background:rgba(255,90,90,.08)}.pvx small{display:block;margin-bottom:6px}.upl{list-style:none;margin:6px 0;padding:0}.upl li{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .acts button{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--accs);color:var(--acc);border:0;border-radius:18px;padding:14px 4px;min-height:70px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .acts svg{width:22px;height:22px}
 .sheetov{z-index:25}.grab{width:38px;height:4px;border-radius:4px;background:var(--bd);margin:-6px auto 14px}
@@ -248,48 +250,107 @@ const mins=s=>{const[h,m]=s.split(':').map(Number);return h*60+m};
 const at=(ds,hm,add=0)=>{const[a,b,c]=ds.split('-').map(Number),[h,m]=hm.split(':').map(Number);return new Date(a,b-1,c,h,m+add)};
 const dmin=b=>Math.round((new Date(b.endAt)-new Date(b.startAt))/6e4);
 const fmt=m=>m>=60?Math.floor(m/60)+'h'+(m%60?' '+m%60+'m':''):m+'m';
-const DEFP={estMin:0,doneMin:0,target:'',days:[1,2,3,4,5],start:'18:00',sessionMin:60,mode:'auto',stale:false};
+const DEFP={estMin:0,doneMin:0,target:'',from:'',days:[0,1,2,3,4,5,6],start:'18:00',sessionMin:60,perDay:1,winS:'06:00',until:'',skipOv:true,mode:'auto',stale:false};
 const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-/* Finish-by date: the user's own, clamped to the deadline; else deadline minus a buffer (3 days if Important, else 2). Never later than the deadline. */
-function effTarget(t,td){const p=t.plan||{};if(p.target&&p.target<=t.dueDate)return p.target;const e=addDays(t.dueDate,t.important===true?-3:-2);return e<td?td:e}
-function slot(ds,dur,start,taken,now,force){for(let sh=0;sh<=180;sh+=15){const s=at(ds,start,sh),e=new Date(+s+dur*6e4);
- if(ymd(s)!==ds||ymd(e)!==ds||s<=now)continue;
- if(force||!taken.some(o=>+new Date(o.startAt)<+e&&+s<+new Date(o.endAt)))return s}return null}
-function collect(p,from,to,dur,taken,now){const out=[];let skipped=0;for(let d=from;d<=to;d=addDays(d,1)){
- if(!p.days.includes(new Date(d+'T00:00').getDay()))continue;let s=slot(d,dur,p.start,taken,now),ov=false;if(!s){s=slot(d,dur,p.start,taken,now,true);ov=!!s}
- if(s)out.push({date:d,startAt:s,endAt:new Date(+s+dur*6e4),ov});else skipped++}return{out,skipped}}
+/* Dates: deadline = last day work may happen (the only cutoff; any old finish-by value is kept on the record but ignored); "start planning from" = first day a session may be placed.
+   Default scheduling window: 6:00 AM to 11:00 PM. Sessions are tried at the preferred start first, then at the next free time AFTER it; every session must FINISH by "Available until" (default 11:00 PM). Session length is exactly what the user chose. */
+const DEF_UNTIL='23:00';
+function effTarget(t,td){return t.dueDate<td?td:t.dueDate}
+const hmN=v=>{const[a,b]=v.split(':').map(Number);return a*60+b};
+/* ---------- Priority (Eisenhower Matrix) ----------
+   Tier: 0 Do (Important+Urgent) 1 Schedule (Important) 2 Delegate (Urgent) 3 Eliminate. Unset Important = not important; unset Urgent = urgent when the deadline is within 3 days.
+   A task may take a time slot held by another task's auto-planned session only if it OUTRANKS that task: a better tier, or (same tier) a deadline at least PRIO_GAP_DAYS earlier. */
+const PRIO_GAP_DAYS=3,PRIO_NAMES=['Do first','Schedule','Delegate','Eliminate'];
+function prioTier(t,td){const imp=t.important===true,u=t.urgent,urg=u===true||(u!==false&&(!t.dueDate||dayNum(t.dueDate)-dayNum(td)<=3)&&!!t.dueDate);return imp?(urg?0:1):(urg?2:3)}
+function outranks(a,b,td){const x=prioTier(a,td),y=prioTier(b,td);if(x!==y)return x<y;return !!(a.dueDate&&b.dueDate&&dayNum(b.dueDate)-dayNum(a.dueDate)>=PRIO_GAP_DAYS)}
+/* ---------- Occupancy index ----------
+   Every existing block as [start,end,block] triples bucketed by local day. Built ONCE per planning run (O(blocks)); slot lookups only look at the one day being tried.
+   `ov` is a small mutable overlay used while planning: blocks tentatively displaced (gone) and sessions tentatively placed (extra). */
+function occIndex(list){const m=new Map();for(const o of list){const s=+new Date(o.startAt),e=+new Date(o.endAt),lo=Math.min(s,e),hi=Math.max(s,e);let d=ymd(new Date(lo));const last=ymd(new Date(hi));
+ for(let g=0;g<400;g++){let a=m.get(d);if(!a)m.set(d,a=[]);a.push(s,e,o);if(d>=last)break;d=addDays(d,1)}}return m}
+const busyAt=(ix,ds,s,e,loc,ov)=>{const a=ix.get(ds);if(a)for(let i=0;i<a.length;i+=3)if(a[i]<e&&s<a[i+1]&&!(ov&&ov.gone.has(a[i+2])))return true;for(let i=0;i<loc.length;i+=2)if(loc[i]<e&&s<loc[i+1])return true;
+ if(ov){const x=ov.extra.get(ds);if(x)for(let i=0;i<x.length;i+=3)if(x[i]<e&&s<x[i+1])return true}return false};
+/* Blocks overlapping [s,e) on day ds; null when the time is also held by something that can never move (this run's own sessions). */
+function hitsAt(ix,ds,s,e,loc,ov){const out=[],a=ix.get(ds);if(a)for(let i=0;i<a.length;i+=3)if(a[i]<e&&s<a[i+1]&&!ov.gone.has(a[i+2])&&!out.includes(a[i+2]))out.push(a[i+2]);
+ for(let i=0;i<loc.length;i+=2)if(loc[i]<e&&s<loc[i+1])return null;const x=ov.extra.get(ds);if(x)for(let i=0;i<x.length;i+=3)if(x[i]<e&&s<x[i+1])return null;return out}
+const newOv=()=>({gone:new Set(),extra:new Map(),log:[]});
+function ovAdd(ov,ds,s,e,tid){let a=ov.extra.get(ds);if(!a)ov.extra.set(ds,a=[]);a.push(s,e,tid);ov.log.push(()=>{a.length-=3})}
+function ovGone(ov,b){ov.gone.add(b);ov.log.push(()=>{ov.gone.delete(b)})}
+const ovUndo=(ov,n)=>{while(ov.log.length>n)ov.log.pop()()};
+let slotCf=false;/* set when the preferred time was usable but blocked by another block, so the session moved */
+const winOf=p=>[p.winS||'06:00',p.until||p.winE||DEF_UNTIL];
+/* free time for a session of `dur` minutes on day ds, first at `start`, then at the next free time after it (inside the window) */
+function slot(ds,dur,start,ix,loc,now,force,win,dsp,ov){const[ws,we]=win||['00:00','23:59'],lo=at(ds,ws),hi=at(ds,we),nowN=+now,loN=+lo,hiN=+hi,durMs=dur*6e4;slotCf=false;let blocked0=false;
+ for(let sh=0;sh<=720;sh+=15){const s=at(ds,start,sh),sN=+s,eN=sN+durMs;
+  if(sN<=nowN||sN<loN||eN>hiN)continue;
+  if(ymd(s)!==ds||ymd(new Date(eN))!==ds)continue;
+  const hit=busyAt(ix,ds,sN,eN,loc,ov);
+  if(force||!hit){slotCf=sh!==0&&blocked0;return s}
+  if(dsp&&tryDisplace(dsp,ix,ds,sN,eN,loc)){slotCf=false;return s}
+  if(sh===0)blocked0=true}return null}
+/* Can every lower-priority auto session in [sN,eN) be moved elsewhere? Moves are only made into FREE time (never cascading), same day first, then the nearest eligible day before that task's own deadline. */
+function tryDisplace(dsp,ix,ds,sN,eN,loc){const ov=dsp.ov,hits=hitsAt(ix,ds,sN,eN,loc,ov);if(!hits||!hits.length)return false;const mark=ov.log.length,mv0=dsp.moves.length;
+ for(const b of hits){if(!canDisplace(b,dsp)){ovUndo(ov,mark);dsp.moves.length=mv0;return false}}
+ ovAdd(ov,ds,sN,eN,dsp.T.id);
+ const moved=[];for(const b of hits){ovGone(ov,b);const to=relocate(b,dsp,ix);if(!to){ovUndo(ov,mark);dsp.moves.length=mv0;return false}moved.push({b,startAt:to.startAt,endAt:to.endAt})}
+ dsp.moves.push(...moved);return true}
+function canDisplace(b,dsp){if(!b.auto||b.locked||b.origin==='manual'||b.type==='break'||(b.status&&b.status!=='planned')||!(+new Date(b.startAt)>+dsp.now))return false;
+ const U=b.taskId&&dsp.tm.get(b.taskId);return !!(U&&!U.deletedAt&&U.id!==dsp.T.id&&U.plan&&U.plan.mode==='auto'&&outranks(dsp.T,U,dsp.td))}
+function relocate(b,dsp,ix){const U=dsp.tm.get(b.taskId),pu=U.plan,ov=dsp.ov,dur=dmin(b),s0=new Date(b.startAt),ds0=ymd(s0),win=winOf(pu),tgtU=effTarget(U,dsp.td),firstU=pu.from&&pu.from>dsp.td?pu.from:dsp.td,[ws,we]=win,lo=+at(ds0,ws),hi=+at(ds0,we),nowN=+dsp.now,sN0=+s0;
+ const place=(ds,s)=>{const e=new Date(+s+dur*6e4);ovAdd(ov,ds,+s,+e,U.id);return{startAt:s,endAt:e}};
+ /* same day, nearest time to the original first */
+ for(let k=1;k<=96;k++)for(const sg of [1,-1]){const sN=sN0+sg*k*15*6e4,eN=sN+dur*6e4;if(sN<=nowN||sN<lo||eN>hi)continue;const s=new Date(sN);if(ymd(s)!==ds0||ymd(new Date(eN))!==ds0)continue;if(!busyAt(ix,ds0,sN,eN,[],ov))return place(ds0,s)}
+ /* another eligible day before this task's deadline, nearest day first, never past it */
+ const span=Math.min(120,dayNum(tgtU)-dayNum(firstU));
+ for(let k=1;k<=span+1;k++)for(const sg of [1,-1]){const d=addDays(ds0,sg*k);if(d<firstU||d>tgtU||!pu.days.includes(new Date(d+'T00:00').getDay()))continue;
+  const a=ix.get(d);let cnt=0;if(a)for(let i=0;i<a.length;i+=3)if(a[i+2].taskId===U.id&&!ov.gone.has(a[i+2]))cnt++;const x=ov.extra.get(d);if(x)for(let i=0;i<x.length;i+=3)if(x[i+2]===U.id)cnt++;if(cnt>=Math.max(1,pu.perDay||1))continue;
+  const s=slot(d,dur,pu.start,ix,[],dsp.now,false,win,null,ov);if(s)return place(d,s)}
+ return null}
+function collect(p,from,to,dur,ix,now,dsp){const out=[],win=winOf(p),pd=Math.max(1,p.perDay||1),ov=dsp&&dsp.ov;let skipped=0;const confl=[],f=p.from&&p.from>from?p.from:from;
+ for(let d=f;d<=to;d=addDays(d,1)){if(!p.days.includes(new Date(d+'T00:00').getDay()))continue;const loc=[];let got=0;
+  for(let k=0;k<pd;k++){const mv0=dsp?dsp.moves.length:0;let s=slot(d,dur,p.start,ix,loc,now,false,win,dsp,ov),ov_=false;if(!s&&k===0){const f2=slot(d,dur,p.start,ix,loc,now,true,win,null,ov);if(f2){confl.push(d);if(!p.skipOv){s=f2;ov_=true}}}
+   if(!s)break;const e=new Date(+s+dur*6e4),mv=dsp?dsp.moves.slice(mv0):[];out.push({date:d,startAt:s,endAt:e,ov:ov_,cf:!ov_&&slotCf,mv});loc.push(+s,+e);if(dsp&&!mv.length)ovAdd(ov,d,+s,+e,dsp.T.id);got++}
+  if(!got)skipped++}return{out,skipped,confl}}
+/* Everything planCalc needs that depends only on the task id and the existing blocks (not the plan settings). `tm` (Map id -> task) enables priority displacement. */
+function planPrep(t,blocks,now,tm){const mine=blocks.filter(b=>b.taskId===t.id),up=mine.filter(b=>b.status!=='done'&&b.status!=='missed'&&new Date(b.endAt)>now),keep=up.filter(b=>!b.auto||b.locked),drop=up.filter(b=>b.auto&&!b.locked),ds=new Set(drop);
+ return{mine,missed:mine.filter(b=>b.status==='missed').length,keep,drop,tm:tm||null,idx:occIndex(blocks.filter(b=>!ds.has(b)))}}
+/* Sessions that were moved to make room for a higher-priority task return to their original time once it is free again (never while locked, started, or if the time is taken). */
+function restoreMoved(blocks,now){const cand=blocks.filter(b=>b.movedFrom&&b.auto&&!b.locked&&(!b.status||b.status==='planned')&&+new Date(b.movedFrom.startAt)>+now);if(!cand.length)return[];
+ const ix=occIndex(blocks),ov=newOv(),done=[];for(const b of cand){const os=+new Date(b.movedFrom.startAt),oe=+new Date(b.movedFrom.endAt),ds=ymd(new Date(os));ov.gone.add(b);
+  if(!busyAt(ix,ds,os,oe,[],ov)){const from=b.startAt;b.startAt=b.movedFrom.startAt;b.endAt=b.movedFrom.endAt;b.date=ds;delete b.movedFrom;delete b.movedSeen;delete b.movedAt;ovAdd(ov,ds,os,oe,b.taskId);done.push({b,from})}else ov.gone.delete(b)}
+ return done}
 /* Rule-based planner. Pure: same inputs, same plan. Never edits the deadline or any block. */
-function planCalc(t,blocks,now){
+function planCalc(t,blocks,now,pp){
  const p=t.plan;if(!p||!(p.estMin>0)||!t.dueDate)return null;
  const td=ymd(now),done=p.doneMin||0,rem=Math.max(0,p.estMin-done),pct=Math.min(100,Math.round(100*done/p.estMin)),tgt=effTarget(t,td);
- const mine=blocks.filter(b=>b.taskId===t.id),missed=mine.filter(b=>b.status==='missed').length;
- const up=mine.filter(b=>b.status!=='done'&&b.status!=='missed'&&new Date(b.endAt)>now),keep=up.filter(b=>!b.auto),drop=up.filter(b=>b.auto);
- const keepMin=keep.reduce((a,b)=>a+dmin(b),0),need=Math.max(0,rem-keepMin),taken=blocks.filter(b=>!drop.includes(b));
- let dur=p.sessionMin,picks=[],skipped=0,short=0,late=null;const R=[];
+ const P=pp||planPrep(t,blocks,now),missed=P.missed,keep=P.keep,drop=P.drop,idx=P.idx,dsp=P.tm&&t.id!=null?{T:t,tm:P.tm,now,td,ov:newOv(),moves:[]}:null;
+ const keepMin=keep.reduce((a,b)=>a+dmin(b),0),need=Math.max(0,rem-keepMin);
+ let dur=p.sessionMin,picks=[],skipped=0,short=0,late=null,cMain={confl:[]};const R=[];
  R.push(`Remaining work: ${fmt(rem)} of ${fmt(p.estMin)} (${pct}% done).`);
- R.push(`Finish-by date ${tgt}`+(p.target&&p.target<=t.dueDate?' (your choice).':` (suggested: ${t.important===true?3:2} days before the deadline${t.important===true?', because the task is Important':''}). Deadline ${t.dueDate} is unchanged.`));
+ R.push(`Sessions can be placed from ${p.from&&p.from>td?p.from:td} through ${tgt} (the deadline, which is never changed), finishing by ${p.until||p.winE||DEF_UNTIL}.`);
  if(need>0){
-  let c=collect(p,td,tgt,dur,taken,now),n=c.out.length;
-  if(n){const d0=Math.min(p.sessionMin,Math.max(15,Math.ceil(need/n/15)*15));if(d0!==dur){dur=d0;c=collect(p,td,tgt,dur,taken,now);n=c.out.length}}
+  let c=collect(p,td,tgt,dur,idx,now,dsp),n=c.out.length;cMain=c;
   skipped=c.skipped;const sess=Math.ceil(need/dur);
   if(n>=sess){const step=Math.floor(n/sess);picks=Array.from({length:sess},(_,i)=>c.out[i*step])}
-  else{dur=n?Math.min(240,Math.ceil(need/n/15)*15):dur;c=collect(p,td,tgt,dur,taken,now);picks=c.out;skipped=c.skipped;
+  else{picks=c.out;skipped=c.skipped;
    short=Math.max(0,need-picks.length*dur);
-   if(short>0){const ext=collect(p,addDays(tgt,1),addDays(tgt,180),p.sessionMin,taken,now).out;let r=short,i=0;late=addDays(tgt,180);
+   if(short>0){const ext=collect(p,addDays(tgt,1),addDays(tgt,180),p.sessionMin,idx,now).out;let r=short,i=0;late=addDays(tgt,180);
     while(r>0&&i<ext.length){late=ext[i].date;r-=p.sessionMin;i++}if(r>0)late=addDays(tgt,180)}}
   if(!short&&picks.length){const last=need-(picks.length-1)*dur;if(last>0&&last<dur){const q=picks[picks.length-1];q.endAt=new Date(+q.startAt+Math.ceil(last/15)*15*6e4)}}}
  const dates=picks.map(x=>x.date).concat(keep.map(b=>ymd(new Date(b.endAt)))).sort(),est=rem===0?null:(late||dates[dates.length-1]||null);
- const atRisk=rem>0&&(short>0||(need>0&&!picks.length)||dur>p.sessionMin||t.dueDate<td);
+ const atRisk=rem>0&&(short>0||(need>0&&!picks.length)||t.dueDate<td);
+ const f0=p.from&&p.from>td?p.from:td;let elig=0;for(let d=f0;d<=tgt;d=addDays(d,1))if(p.days.includes(new Date(d+'T00:00').getDay()))elig++;
+ const perDayNeed=elig?Math.ceil(need/elig/5)*5:0,fixLen=elig?Math.ceil(need/(elig*Math.max(1,p.perDay||1))/15)*15:0;
  if(keep.length)R.push(`${keep.length} manual session(s) already cover ${fmt(keepMin)} and are kept exactly as they are.`);
  const ovn=picks.filter(x=>x.ov).length;if(ovn)R.push(`${ovn} session(s) overlap another block. They are still planned and shown in red in Focus, so nothing is hidden. Move one if you prefer.`);
- if(skipped)R.push(`${skipped} workday(s) skipped because the preferred time had already passed.`);
+ if(skipped)R.push(`${skipped} workday(s) have no free time in your working hours (or the time already passed) and are left unscheduled.`);
  if(missed)R.push(`${missed} earlier session(s) were missed. They don't count as progress, so the work is spread over the days that are left.`);
- if(dur>p.sessionMin&&short===0)R.push(`Not enough workdays at ${p.sessionMin} min, so sessions are lengthened to ${fmt(dur)}.`);
- if(short>0)R.push(`Even at full capacity ${fmt(short)} would remain by ${tgt}. At this pace you would finish around ${late}.${late>t.dueDate?' That is after your deadline.':''} Add workdays or time, or review the estimate. The deadline is not changed.`);
+ if(short>0)R.push(`Even at full capacity ${fmt(short)} would remain by ${tgt}: your settings fit ${fmt(need-short)} of ${fmt(need)}, and about ${fmt(perDayNeed)} a day over ${elig} eligible day(s) is needed. At this pace you would finish around ${late}.${late>t.dueDate?' That is after your deadline.':''} Your deadline and preferences are not changed.`);
  if(t.dueDate<td&&rem>0)R.push('The deadline has passed. Nothing is moved automatically.');
  if(!atRisk&&picks.length&&est)R.push(`${picks.length} session(s) spread over your workdays finish ${est}, ${dayNum(t.dueDate)-dayNum(est)} day(s) before the deadline.`);
  const weeks=Math.max(1,(dayNum(tgt)-dayNum(td)+1)/7);
- return{rem,pct,tgt,keep,drop,picks,recMin:dur,perWeek:picks.length?Math.min(p.days.length,Math.max(1,Math.ceil(picks.length/weeks))):0,est,atRisk,short,missed,skipped,overlap:ovn,reasons:R}}
+ const moves=picks.flatMap(x=>x.mv||[]);if(moves.length)R.push(`${moves.length} lower-priority auto session(s) will move to make room for this task's preferred times. Nothing is overwritten and none leaves its own deadline.`);
+ return{conflict:cMain.confl.length,conflictDays:cMain.confl,moves,displaced:moves.length,tier:prioTier(t,td),moved:picks.filter(x=>x.cf).length,rem,need,elig,perDayNeed,fixLen,pct,tgt,keep,drop,picks,recMin:dur,perWeek:picks.length?Math.min(p.days.length,Math.max(1,Math.ceil(picks.length/weeks))):0,est,atRisk,short,missed,skipped,overlap:ovn,reasons:R}}
 /* Planned sessions whose time has passed without being logged become "missed" (and flag the plan as outdated). */
 function sweepMissed(S,now){let n=0;for(const b of S.blocks){const t=S.tasks.find(x=>x.id===b.taskId&&!x.deletedAt);
  if(t&&t.plan&&t.plan.estMin>0&&b.type!=='break'&&(!b.status||b.status==='planned')&&new Date(b.endAt)<now){b.status='missed';t.plan.stale=true;n++}}return n}
@@ -357,11 +418,12 @@ function wheelAt(T,X,R){const h=T.hAt(X),sl=T.slAt(X),q=Math.sqrt(1+sl*sl);retur
 const $=s=>document.querySelector(s),K='uf1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let storeOK=true;
-function load(){try{const j=JSON.parse(localStorage.getItem(K));if(j&&Array.isArray(j.tasks))return j}catch(e){}
+const normBlocks=j=>{for(const b of j.blocks||[]){if(!b.origin)b.origin=b.auto?'auto':'manual';if(b.plannedMin==null&&b.startAt)b.plannedMin=Math.round((new Date(b.endAt)-new Date(b.startAt))/6e4)}return j};
+function load(){try{const j=JSON.parse(localStorage.getItem(K));if(j&&Array.isArray(j.tasks))return normBlocks(j)}catch(e){}
  return{tasks:[],blocks:[],prio:{},set:{theme:'dark',weekStart:1},sess:null}}
 let S=load();
 function saveLocal(){try{localStorage.setItem(K,JSON.stringify(S));storeOK=true}catch(e){storeOK=false}}
-function save(){S.savedAt=Date.now();saveLocal();pushSoon();try{window.FocusyNative&&FocusyNative.onSave(S.sess?notePlan(S.sess,Date.now(),MV()):[],S)}catch(e){}}
+function save(){normBlocks(S);S.savedAt=Date.now();saveLocal();pushSoon();try{window.FocusyNative&&FocusyNative.onSave(S.sess?notePlan(S.sess,Date.now(),MV()):[],S)}catch(e){}}
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
 const nowIso=()=>new Date().toISOString();
 const today=()=>ymd(new Date());
@@ -372,6 +434,8 @@ const dlong=s=>new Date(s+'T00:00').toLocaleDateString([],{weekday:'long',month:
 const fd=s=>new Date(s+'T00:00').toLocaleDateString([],{month:'short',day:'numeric'}),fdt=d=>new Date(d).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 const live=()=>S.tasks.filter(t=>!t.deletedAt),open=()=>live().filter(t=>t.status!=='done'&&t.status!=='archived');
 const tById=id=>S.tasks.find(t=>t.id===id&&!t.deletedAt);
+const taskMap=()=>new Map(S.tasks.filter(x=>!x.deletedAt).map(x=>[x.id,x]));
+const planFor=(t,now=new Date())=>planCalc(t,S.blocks,now,planPrep(t,S.blocks,now,taskMap()));
 function addTask(o){const n=nowIso(),t={id:uid(),title:'',notes:'',status:'todo',important:null,urgent:null,dueDate:'',scheduledDate:'',createdAt:n,updatedAt:n,completedAt:null,deletedAt:null,...o};S.tasks.push(t);return t}
 function sev(t){if(t.status==='done')return'done';if(!t.dueDate)return'none';const d=daysLeft(t.dueDate);return d<=0?'emg':d<=5?'urg':d<=9?'upc':'safe'}
 function badge(t){const s=sev(t);if(s==='none')return'';const d=daysLeft(t.dueDate);
@@ -487,7 +551,8 @@ function ovRender(all){return ovGroups(all).map(g=>{if(g.length<2)return bcard(g
  return`<div class="ovg" role="group" aria-label="${g.length} overlapping blocks"><div class="ovh">⚠ ${g.length} blocks overlap · ${tf(new Date(g[0].startAt))} – ${tf(new Date(e))}</div>${g.map(b=>bcard(b,all)).join('')}</div>`}).join('')}
 function bcard(b,all){const s=new Date(b.startAt),e=new Date(b.endAt),n=Date.now(),cur=+s<=n&&n<+e,
  ov=all.some(o=>o!==b&&+new Date(o.startAt)<+e&&+s<+new Date(o.endAt));
- return`<div class="blk${cur?' cur':''}${b.type==='break'?' brk':''}${ov?' ov':''}" data-act="editblock" data-id="${b.id}" tabindex="0" role="button"><div class="bt">${tf(s)}<small>${tf(e)}</small></div><div class="bc"><span class="bi" aria-hidden="true">${b.type==='break'?IC.cup:IC.book}</span><div class="bb"><b>${esc(btitle(b))}</b><small>${Math.round((e-s)/6e4)} min${ymd(e)!==ymd(s)?' · ends next day':''}${cur?' · <span class="nowt">NOW</span>':''}${ov?' · <span class="warn">⚠ Overlap</span>':''}${b.status==='done'?' · ✓ done'+(b.workedMin!==undefined?' ('+b.workedMin+' min)':''):''}${b.status==='missed'?' · <span class="warn">missed</span>':''}${b.auto?' · Smart':''}</small></div>${(()=>{const k=tById(b.taskId);return k&&k.plan&&k.plan.estMin&&b.type!=='break'&&b.status!=='done'?`<button class="btn g" style="min-height:40px;padding:6px 12px;align-self:center" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''})()}</div></div>`}
+ return`<div class="blk${cur?' cur':''}${b.type==='break'?' brk':''}${ov?' ov':''}" data-act="editblock" data-id="${b.id}" tabindex="0" role="button"><div class="bt">${tf(s)}<small>${tf(e)}</small></div><div class="bc"><span class="bi" aria-hidden="true">${b.type==='break'?IC.cup:IC.book}</span><div class="bb"><b>${esc(btitle(b))}</b><small>${Math.round((e-s)/6e4)} min${ymd(e)!==ymd(s)?' · ends next day':''}${cur?' · <span class="nowt">NOW</span>':''}${ov?' · <span class="warn">⚠ Overlap</span>':''}${b.status==='done'?' · ✓ done'+(b.workedMin!==undefined?' ('+b.workedMin+' min)':''):''}${b.status==='missed'?' · <span class="warn">missed</span>':''}${b.auto?' · Smart':''}${b.locked?' · <span class="lk">🔒 Kept</span>':''}</small>${b.movedFrom&&!b.movedSeen?`<small class="mvd">↻ Moved automatically from ${tf(new Date(b.movedFrom.startAt))} <a href="#" data-act="ackmove" data-id="${b.id}">Got it</a></small>`:''}</div>${(()=>{const k=tById(b.taskId),el=k&&b.type!=='break'&&b.status!=='done'&&b.status!=='missed',lg=k&&k.plan&&k.plan.estMin&&b.type!=='break'&&b.status!=='done';
+ return el||lg?`<div class="bact">${lg?`<button class="btn g" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''}${el?`<button class="play" data-act="playblock" data-id="${b.id}" aria-label="Start focus: ${esc(btitle(b))}">${ICO.play}</button>`:''}</div>`:''})()}</div></div>`}
 function dlist(){let L=live().filter(t=>t.dueDate);const q=dlq.toLowerCase();
  if(q)L=L.filter(t=>(t.title+' '+t.notes).toLowerCase().includes(q));
  L=L.filter(t=>dlf==='all'?t.status!=='done':sev(t)===dlf);
@@ -500,51 +565,57 @@ const closeM=()=>{$('#modal').innerHTML='';curD=null};
 function sheet(title,body){closeSheet();$('#modal').insertAdjacentHTML('beforeend',`<div class="ov sheetov" data-act="closesheet"><div class="md" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="grab"></div><h2>${esc(title)}</h2>${body}</div></div>`)}
 const closeSheet=()=>{const e=$('.sheetov');if(e)e.remove()};
 function taskModal(id,pre){const t=id?tById(id):{title:'',notes:'',important:null,urgent:null,dueDate:'',scheduledDate:'',...pre};if(id&&!t)return;
- const p={...DEFP,...(t.plan||{})},h=Math.floor(p.estMin/60),m=p.estMin%60,dh=Math.floor((p.doneMin||0)/60),dm=(p.doneMin||0)%60;
- modal(id?'Edit task':'New task',`<label for="m-t">Task</label><input id="m-t" value="${esc(t.title)}" placeholder="What needs doing?">
+ const p={...DEFP,...(t.plan||{})},isC=![15,20,30,45,60,90,120,180].includes(p.sessionMin),h=Math.floor(p.estMin/60),m=p.estMin%60,dh=Math.floor((p.doneMin||0)/60),dm=(p.doneMin||0)%60;
+ modal(id?'Edit task':'New task',`<div class="sec">Essentials</div><label for="m-t">Task</label><input id="m-t" value="${esc(t.title)}" placeholder="What needs doing?">
  <label for="m-d">Deadline</label><input type="date" id="m-d" value="${t.dueDate||''}">
- <label>Estimated work</label><div class="pair"><input type="number" id="pl-h" min="0" placeholder="hours" value="${h||''}" aria-label="Estimated hours"><input type="number" id="pl-m" min="0" max="59" step="5" placeholder="minutes" value="${m||''}" aria-label="Estimated minutes"></div>
- <div class="plprev" id="pl-prev" aria-live="polite"></div>
- <details class="mo"><summary>More options</summary>
+ <label>Estimated total work</label><div class="pair"><input type="number" id="pl-h" min="0" placeholder="hours" value="${h||''}" aria-label="Estimated hours"><input type="number" id="pl-m" min="0" max="59" step="5" placeholder="minutes" value="${m||''}" aria-label="Estimated minutes"></div>
+ <small class="mut">Leave empty for an appointment that needs no preparation.</small>
+ <label for="pl-f">Start planning from</label><input type="date" id="pl-f" value="${p.from||''}" placeholder="Today">
  <div class="grid2"><div><label for="m-i">Important?</label><select id="m-i">${triOpts(t.important)}</select></div><div><label for="m-u">Urgent?</label><select id="m-u">${triOpts(t.urgent)}</select></div></div>
- <label for="m-s">Scheduled day</label><input type="date" id="m-s" value="${t.scheduledDate||''}">
- <label for="m-n">Notes</label><textarea id="m-n">${esc(t.notes)}</textarea>
- <label for="pl-t">Finish-by date (optional, on or before the deadline)</label><input type="date" id="pl-t" value="${p.target||''}">
- <label>Work done so far</label><div class="pair"><input type="number" id="pl-dh" min="0" placeholder="hours" value="${dh||''}" aria-label="Hours done"><input type="number" id="pl-dm" min="0" max="59" step="5" placeholder="minutes" value="${dm||''}" aria-label="Minutes done"></div>
+ <label for="m-n">Notes (optional)</label><textarea id="m-n">${esc(t.notes)}</textarea>
+ <div class="plprev" id="pl-prev" aria-live="polite"></div>
+ <details class="mo"><summary>Smart scheduling</summary>
+ <label for="pl-o">Automatically plan sessions</label><select id="pl-o">${opts([['auto','On: plan focus sessions for me'],['manual','Off: I schedule sessions myself']],p.mode)}</select>
  <label>Preferred workdays</label><div class="dchips">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" class="pl-d" value="${d}"${p.days.includes(d)?' checked':''}>${DN[d]}</label>`).join('')}</div>
- <div class="grid2"><div><label for="pl-s">Preferred start</label><select id="pl-s">${opts(slots,p.start)}</select></div><div><label for="pl-l">Longest session</label><select id="pl-l">${opts([30,45,60,90,120,180].map(x=>[x,x+' min']),p.sessionMin)}</select></div></div>
- <label for="pl-o">Scheduling</label><select id="pl-o">${opts([['auto','Automatic: plan sessions for me'],['manual','Manual: I schedule sessions myself']],p.mode)}</select></details>
+ <div class="grid2"><div><label for="pl-s">Preferred start time</label><select id="pl-s">${opts(slots,p.start)}</select></div><div><label for="pl-l">Preferred session length</label><select id="pl-l">${opts([15,20,30,45,60,90,120,180].map(x=>[x,x+' min']).concat([['custom','Custom…']]),isC?'custom':p.sessionMin)}</select><input type="number" id="pl-lc" min="5" max="480" step="5" placeholder="minutes" value="${isC?p.sessionMin:''}"${isC?'':' hidden'} aria-label="Custom session minutes"></div></div>
+ <label for="pl-pd">Sessions per day</label><select id="pl-pd">${opts([1,2,3].map(x=>[x,String(x)]),p.perDay||1)}</select>
+ <label for="pl-u">Available until (optional)</label><select id="pl-u">${opts([['','Default (11:00 PM)']].concat(slots.filter(q=>q[0]>='07:00')),p.until||(p.winE&&p.winE!=='23:00'?p.winE:''))}</select><small class="mut">The latest time you are willing to finish. A session must end by then; if your preferred time is busy, Focusy tries the nearest free time inside this window.</small>
+ <label class="chk"><input type="checkbox" id="pl-so"${p.skipOv?' checked':''}> Never overlap another block: leave a day unscheduled if it has no free time</label>
+ <label for="m-s">Scheduled day</label><input type="date" id="m-s" value="${t.scheduledDate||''}">
+ <label>Work done so far</label><div class="pair"><input type="number" id="pl-dh" min="0" placeholder="hours" value="${dh||''}" aria-label="Hours done"><input type="number" id="pl-dm" min="0" max="59" step="5" placeholder="minutes" value="${dm||''}" aria-label="Minutes done"></div></details>
  <div class="err" id="merr"></div>
  <div class="btns"><button class="btn" data-act="savetask" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${id?`<button class="btn r" data-act="deltask" data-id="${id}">Delete</button>`:''}</div>`);planPreview()}
 /* Live preview in the task form: how much time per day the planner will ask for, using the same planner that creates the sessions. */
+let pvT=0;
 function planPreview(){const el0=$('#pl-prev');if(!el0)return;const el={set innerHTML(h){if(el0._h!==h){el0._h=h;el0.innerHTML=h}}};const due=$('#m-d').value,g=i=>+($(i).value)||0,est=g('#pl-h')*60+g('#pl-m');
  if(!est){el.innerHTML='<small>Enter your estimated work to see how much time you need each day.</small>';return}
  if(!due){el.innerHTML='<small>Add a deadline to see your time per day.</small>';return}
  const pl=readPlan(due);if(!pl||pl.err){el.innerHTML=`<small class="warn">${pl&&pl.err?esc(pl.err):''}</small>`;return}
  if(pl.mode==='manual'){el.innerHTML='<small>Manual scheduling: nothing is planned for you. You add your own sessions.</small>';return}
- const sb=$('#modal [data-act="savetask"]'),id=sb&&sb.dataset.id,t={id:id||'__new',dueDate:due,important:unt($('#m-i').value),plan:{...DEFP,...pl}},c=planCalc(t,S.blocks,new Date());
+ const sb=$('#modal [data-act="savetask"]'),id=sb&&sb.dataset.id,t={id:id||'__new',dueDate:due,important:unt($('#m-i').value),urgent:unt($('#m-u').value),plan:{...DEFP,...pl}},now0=new Date(),pp=planPrep(t,S.blocks,now0,taskMap()),c=planCalc(t,S.blocks,now0,pp);
  if(!c){el.innerHTML='';return}
  if(c.rem===0){el.innerHTML='<small>Nothing left to plan: the work done already covers the estimate.</small>';return}
- const items=c.picks.map(x=>({d:x.date,m:Math.round((x.endAt-x.startAt)/6e4),ov:x.ov,s:x.startAt,e:x.endAt})),mine=b=>id&&b.taskId===id&&b.auto,now=new Date();
+ const items=c.picks.map(x=>({d:x.date,m:Math.round((x.endAt-x.startAt)/6e4),ov:x.ov,cf:x.cf,s:x.startAt,e:x.endAt})),mine=b=>id&&b.taskId===id&&b.auto,now=new Date();
  const hits=(st,en)=>S.blocks.filter(b=>!mine(b)&&b.status!=='missed'&&+new Date(b.startAt)<+en&&+st<+new Date(b.endAt));
- const cnames=x=>{const h=hits(x.s,x.e),n=[...new Set(h.map(b=>`${esc(btitle(b))} ${tf(new Date(b.startAt))}–${tf(new Date(b.endAt))}`))];return n.slice(0,2).join(', ')+(n.length>2?` +${n.length-2} more`:'')};
- let free='';if(c.overlap){const cur=(pl.start||'18:00').split(':').map(Number),cm=cur[0]*60+cur[1],ok=slots.map(q=>q[0]).filter(v=>v>='06:00'&&v<='21:45').filter(v=>{const c2=planCalc({...t,plan:{...t.plan,start:v}},S.blocks,now);return c2&&!c2.overlap&&c2.picks.length>0}).sort((a,b)=>Math.abs(+a.slice(0,2)*60+ +a.slice(3)-cm)-Math.abs(+b.slice(0,2)*60+ +b.slice(3)-cm)).slice(0,4);
+ const cnames=x=>{const ps=x.cf?at(x.d,pl.start||'18:00'):x.s,h=hits(ps,x.cf?new Date(+ps+x.m*6e4):x.e),n=[...new Set(h.map(b=>`${esc(btitle(b))} ${tf(new Date(b.startAt))}–${tf(new Date(b.endAt))}`))];return n.slice(0,2).join(', ')+(n.length>2?` +${n.length-2} more`:'')};
+ let free='';if(c.overlap||c.moved||c.conflict){const cur=(pl.start||'18:00').split(':').map(Number),cm=cur[0]*60+cur[1],ok=slots.map(q=>q[0]).filter(v=>v>='06:00'&&v<='21:45').filter(v=>{const c2=planCalc({...t,plan:{...t.plan,start:v}},S.blocks,now,pp);return c2&&!c2.overlap&&!c2.moved&&!c2.conflict&&!c2.displaced&&c2.picks.length>0}).sort((a,b)=>Math.abs(+a.slice(0,2)*60+ +a.slice(3)-cm)-Math.abs(+b.slice(0,2)*60+ +b.slice(3)-cm)).slice(0,4);
   free=ok.length?`<div class="pvf"><small>Free on all these days. Tap to start then:</small><div class="pvch">${ok.map(v=>`<button type="button" class="pvs" data-act="pvstart" data-t="${v}">${hm(v)}</button>`).join('')}</div><button type="button" class="lnk pvo" data-act="pvopen">Or change the start time below ↓</button></div>`:`<div class="pvf"><small>No single start time is free on every day. Try a shorter session, other workdays, or move the other block.</small><button type="button" class="lnk pvo" data-act="pvopen">Change start time and sessions below ↓</button></div>`}
- if(!items.length){el.innerHTML=`<div class="pvh warn">⚠ No workday available before ${fd(c.tgt)}</div><small>Your deadline stays ${fd(due)}. Pick more workdays, start earlier, or lower the estimate.</small>`;return}
+ if(!items.length){const un=hm(pl.until||DEF_UNTIL);el.innerHTML=`<div class="pvh warn">⚠ Time conflict detected: no free ${fmt(pl.sessionMin)} slot between ${hm(pl.start)} and ${un} on any workday before ${fd(c.tgt)}${c.conflict?` (your time overlaps with ${cnames({cf:true,d:c.conflictDays[0],m:pl.sessionMin})||'another block'})`:''}</div><small>Nothing was overlapped or overwritten, and your deadline stays ${fd(due)}. ${fmt(c.short||c.need)} stays unscheduled. Try a later Available until, a shorter session, more workdays, or an earlier start.</small>${free}`;return}
  const tot=items.reduce((a,x)=>a+x.m,0),avg=Math.round(tot/items.length/5)*5||tot,show=items.slice(0,6);
- el.innerHTML=`<div class="pvh">About <b>${fmt(avg)}</b> a day · ${items.length} day${items.length>1?'s':''}</div>
- <small>${fd(items[0].d)}${items.length>1?' – '+fd(items[items.length-1].d):''} · finish by ${fd(c.tgt)} · deadline ${fd(due)} unchanged</small>
- <ul class="pvl">${show.map(x=>`<li><div class="pvr"><span>${new Date(x.d+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span><span class="pvt">${tf(x.s)} – ${tf(x.e)}</span><b>${fmt(x.m)}</b></div>${x.ov?`<div class="pvc warn">⚠ overlaps ${cnames(x)||'another block'}</div>`:''}</li>`).join('')}${items.length>show.length?`<li class="mut">+ ${items.length-show.length} more day${items.length-show.length>1?'s':''}</li>`:''}</ul>
- ${c.overlap?`<small class="warn">⚠ ${c.overlap} session${c.overlap>1?'s':''} overlap another block. They are still planned and shown in red in Focus.</small>`:''}${free}
- ${c.short>0||due<ymd(new Date())?`<small class="warn">⚠ ${esc(c.reasons.filter(r=>/Even at full|passed/.test(r)).join(' ')||'This plan is tight.')}</small>`:c.reasons.some(r=>/Not enough workdays/.test(r))?`<small>${esc(c.reasons.find(r=>/Not enough workdays/.test(r)))}</small>`:''}`}
-['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if($('#pl-prev')&&e.target.closest&&e.target.closest('#modal'))planPreview()}));
+ el.innerHTML=`<div class="pvh">About <b>${fmt(avg)}</b> a day · ${items.length} day${items.length>1?'s':''}</div><small class="mut">Matrix priority: ${PRIO_NAMES[c.tier]}</small>
+ <small>${fd(items[0].d)}${items.length>1?' – '+fd(items[items.length-1].d):''} · through the deadline ${fd(due)} (unchanged)</small>
+ <ul class="pvl">${show.map(x=>`<li><div class="pvr"><span>${new Date(x.d+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span><span class="pvt">${tf(x.s)} – ${tf(x.e)}</span><b>${fmt(x.m)}</b></div>${x.cf?`<div class="pvc">↔ moved from ${hm(pl.start)} (free time)</div>`:''}${x.ov?`<div class="pvc warn">⚠ overlaps ${cnames(x)||'another block'}</div>`:''}</li>`).join('')}${items.length>show.length?`<li class="mut">+ ${items.length-show.length} more day${items.length-show.length>1?'s':''}</li>`:''}</ul>
+ ${c.conflict&&!c.overlap?`<div class="pvx"><small class="warn">⚠ Time conflict detected. ${c.conflict} day${c.conflict>1?'s have':' has'} no free ${fmt(pl.sessionMin)} slot between ${hm(pl.start)} and ${hm(pl.until||DEF_UNTIL)} (your time overlaps with ${cnames({cf:true,d:c.conflictDays[0],m:pl.sessionMin})||'another block'}). Those sessions stay unscheduled. Nothing is overwritten.</small>${free}</div>`:''}${c.displaced?`<div class="pvx pvm"><small>↻ <b>${c.displaced}</b> lower-priority auto session${c.displaced>1?'s':''} will move so this ${PRIO_NAMES[c.tier].toLowerCase()} task gets its preferred time${c.moves.slice(0,3).map(m=>`<br>${esc(btitle(m.b))}: ${fdt(m.b.startAt)} → ${tf(m.startAt)}${ymd(m.startAt)!==ymd(new Date(m.b.startAt))?' ('+fd(ymd(m.startAt))+')':''}`).join('')}${c.displaced>3?`<br>+ ${c.displaced-3} more`:''}</small><small class="mut">Manual, locked, started and completed sessions never move.</small></div>`:''}${!c.overlap&&c.moved?`<div class="pvx"><small class="warn">⚠ Time conflict detected. Your preferred time ${hm(pl.start)} overlaps with ${cnames(items.find(x=>x.cf))||'another block'}. ${c.moved} session${c.moved>1?'s were':' was'} moved to the nearest free time (shown below). Nothing is overwritten.</small>${free}</div>`:''}${c.overlap?`<div class="pvx"><small class="warn">⚠ Time conflict detected. Your preferred time overlaps with ${cnames(items.find(x=>x.ov))||'another block'}. ${c.overlap} session${c.overlap>1?'s':''} overlap; they stay visible in red in Focus. Nothing is overwritten.</small>${free}<button type="button" class="lnk pvo" data-act="pvfix" data-k="skip">Leave the overlapping days unscheduled</button></div>`:''}
+ ${c.short>0?`<div class="pvx"><small class="warn">⚠ ${esc(c.reasons.find(r=>/Even at full/.test(r))).replace(/\d{4}-\d\d-\d\d/g,x=>fd(x))}</small><small>Options:</small><div class="pvch">${[c.fixLen>pl.sessionMin&&c.fixLen<=480?`<button type="button" class="pvs" data-act="pvfix" data-k="l" data-v="${c.fixLen}">Sessions of ${fmt(c.fixLen)}</button>`:'',(pl.perDay||1)<3?`<button type="button" class="pvs" data-act="pvfix" data-k="pd" data-v="${(pl.perDay||1)+1}">Add a session per day</button>`:'',pl.days.length<7?'<button type="button" class="pvs" data-act="pvfix" data-k="days">Use all 7 days</button>':'','<button type="button" class="pvs" data-act="pvfix" data-k="est">Adjust estimate</button>'].join('')}</div><small class="mut">Or keep this plan: ${fmt(c.short)} stays unscheduled and the deadline does not change.</small></div>`:''}
+ ${due<ymd(new Date())?'<small class="warn">⚠ The deadline has passed. Nothing is moved automatically.</small>':''}`}
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if($('#pl-prev')&&e.target.closest&&e.target.closest('#modal')){if(e.target.id==='pl-l'){const c=$('#pl-lc');c.hidden=e.target.value!=='custom';if(!c.hidden&&!c.value)c.value=30}clearTimeout(pvT);if(ev==='input'&&e.target.type!=='checkbox'){pvT=setTimeout(planPreview,80)}else planPreview()}}));
 function blockModal(id){const b=id?S.blocks.find(x=>x.id===id):null,s=b?new Date(b.startAt):(()=>{const d=new Date();d.setMinutes(Math.ceil((d.getMinutes()+1)/15)*15,0,0);return d})();
  const sv=pad(s.getHours())+':'+pad(s.getMinutes()),dur=b?Math.round((new Date(b.endAt)-s)/6e4):30;
  modal(b?'Edit block':'New time block',`<label for="b-y">Type</label><select id="b-y">${opts([['task','Task'],['break','Break']],b?b.type:'task')}</select>
  <label for="b-l">Existing task</label><select id="b-l"><option value="">— new task (type below) —</option>${opts(open().concat(b&&b.taskId&&tById(b.taskId)&&!open().includes(tById(b.taskId))?[tById(b.taskId)]:[]).map(t=>[t.id,t.title]),b?b.taskId:'')}</select>
  <label for="b-t">Title (new task or break label)</label><input id="b-t" value="${b&&!b.taskId?esc(b.title):''}">
  <div class="grid2"><div><label for="b-d">Date</label><input type="date" id="b-d" value="${ymd(s)}"></div><div><label for="b-s">Start</label><select id="b-s">${opts(slots,sv)}</select></div></div>
- <label for="b-m">Duration (minutes, multiples of 15)</label><input type="number" id="b-m" min="15" step="15" value="${dur}"><div class="err" id="merr"></div>
+ <label for="b-m">Duration (minutes, multiples of 15)</label><input type="number" id="b-m" min="15" step="15" value="${dur}"><div class="err" id="merr"></div>${b&&b.type!=='break'?`<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="b-k" ${b.locked?'checked':''}> Keep this time (Smart planning won't move it)</label>`:''}
  <div class="btns"><button class="btn" data-act="saveblock" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${b&&b.type!=='break'?`<button class="btn g" data-act="startblock" data-id="${id}">Start Focus</button>`:''}${b?`<button class="btn r" data-act="delblock" data-id="${id}">Delete</button>`:''}</div>`)}
 function prioModal(d){const p=S.prio[d]||{},cand=open().concat(p.taskId&&tById(p.taskId)&&!open().includes(tById(p.taskId))?[tById(p.taskId)]:[]);
  modal('One Thing · '+dlong(d),`<label for="p-t">Task</label><select id="p-t"><option value="">— new task (type below) —</option>${opts(cand.map(t=>[t.id,t.title]),p.taskId||'')}</select>
@@ -556,32 +627,42 @@ const merr=m=>{$('#merr').textContent=m};
 
 function readPlan(due){const g=i=>+($(i).value)||0,est=g('#pl-h')*60+g('#pl-m');if(!est&&!$('#pl-dh').value&&!$('#pl-dm').value)return null;
  if(!est)return{err:'Enter the estimated total work.'};if(!due)return{err:'Add a due date to use the Smart Work Plan.'};
- const tg=$('#pl-t').value;if(tg&&tg>due)return{err:'Finish-by date must be on or before the deadline.'};
+ const fr=$('#pl-f').value;if(fr&&fr>due)return{err:'Start planning from must be on or before the deadline.'};
+ const sm=$('#pl-l').value==='custom'?(+$('#pl-lc').value||0):+$('#pl-l').value;if(!(sm>=5&&sm<=480))return{err:'Enter a session length between 5 and 480 minutes.'};const un=$('#pl-u').value;if(un&&hmN(un)<=hmN($('#pl-s').value))return{err:'Available until must be later than the preferred start time.'};if(un&&hmN(un)-360<sm)return{err:'A '+sm+'-minute session cannot finish by that time. Choose a later Available until or a shorter session.'};
  const days=[...document.querySelectorAll('.pl-d:checked')].map(x=>+x.value);if(!days.length)return{err:'Pick at least one workday.'};
- return{estMin:est,doneMin:g('#pl-dh')*60+g('#pl-dm'),target:tg,days,start:$('#pl-s').value,sessionMin:+$('#pl-l').value,mode:$('#pl-o').value}}
-function reviewModal(id){const t=tById(id),c=t&&planCalc(t,S.blocks,new Date());if(!c)return;
- sheet('Review schedule',`<b>${esc(t.title)}</b><small>${c.keep.length?`Your ${c.keep.length} manual session(s) stay exactly as they are. `:''}${c.drop.length?`This replaces ${c.drop.length} upcoming auto-planned session(s). `:''}Nothing changes until you approve.</small>
+ return{estMin:est,doneMin:g('#pl-dh')*60+g('#pl-dm'),from:fr,days,start:$('#pl-s').value,sessionMin:sm,perDay:+$('#pl-pd').value||1,until:un,skipOv:$('#pl-so').checked,mode:$('#pl-o').value}}
+function reviewModal(id){const t=tById(id),c=t&&planFor(t);if(!c)return;
+ sheet('Review schedule',`<b>${esc(t.title)}</b><small>${c.keep.length?`Your ${c.keep.length} manual session(s) stay exactly as they are. `:''}${c.drop.length?`This replaces ${c.drop.length} upcoming auto-planned session(s). `:''}Completed and missed sessions stay in your history. Nothing changes until you approve.</small>
  ${c.atRisk?`<div class="err" style="min-height:0;margin:8px 0">${esc(c.reasons.find(r=>/Even at|lengthened|passed/.test(r))||'This plan is at risk.')}</div>`:''}
- <div class="sec">${c.picks.length} new session(s)</div>${c.picks.map(x=>`<div class="row"><div class="rt">${fdt(x.startAt)} – ${tf(x.endAt)}</div><small>${Math.round((x.endAt-x.startAt)/6e4)} min</small></div>`).join('')||'<div class="empty">No new sessions needed.</div>'}
+ ${c.moves.length?`<div class="sec">${c.moves.length} lower-priority session(s) will move</div>${c.moves.slice(0,5).map(m=>`<div class="row"><div class="rt">${esc(btitle(m.b))}</div><small>${fdt(m.b.startAt)} → ${tf(m.startAt)}${ymd(m.startAt)!==ymd(new Date(m.b.startAt))?' ('+fd(ymd(m.startAt))+')':''}</small></div>`).join('')}${c.moves.length>5?`<small class="mut">+ ${c.moves.length-5} more</small>`:''}`:''}<div class="sec">${c.picks.length} new session(s)</div>${c.picks.map(x=>`<div class="row"><div class="rt">${fdt(x.startAt)} – ${tf(x.endAt)}</div><small>${Math.round((x.endAt-x.startAt)/6e4)} min</small></div>`).join('')||'<div class="empty">No new sessions needed.</div>'}
  <div class="btns"><button class="btn" data-act="applyplan" data-id="${id}">Approve &amp; schedule</button><button class="btn g" data-act="closesheet">Cancel</button></div>`)}
 function logModal(bid,tid,def){const b=bid&&S.blocks.find(x=>x.id===bid),t=tById(tid||(b&&b.taskId));if(!t)return;
  modal('Log work',`<b>${esc(t.title)}</b><label for="lg">Minutes actually worked</label><input type="number" id="lg" min="0" step="5" value="${def||(b?dmin(b):30)}"><div class="btns"><button class="btn" data-act="savelog" data-b="${bid||''}" data-t="${t.id}">Save</button><button class="btn g" data-act="close">Cancel</button></div>`)}
-function applyFor(t){const c=planCalc(t,S.blocks,new Date());if(!c)return null;S.blocks=S.blocks.filter(b=>!c.drop.includes(b));
- const ids=c.picks.map(x=>{const id=uid();S.blocks.push({id,type:'task',taskId:t.id,title:'',startAt:x.startAt.toISOString(),endAt:x.endAt.toISOString(),auto:true,status:'planned',createdAt:nowIso(),updatedAt:nowIso()});return id});t.plan.stale=false;return{c,ids}}
+const samePlan=c=>!c.moves.length&&c.drop.length===c.picks.length&&c.drop.every(b=>c.picks.some(x=>+x.startAt===+new Date(b.startAt)&&+x.endAt===+new Date(b.endAt)));
+function applyFor(t){const now=new Date(),c=planFor(t,now);if(!c)return null;const dropped=c.drop.slice(),prev=c.moves.map(m=>({b:m.b,s:m.b.startAt,e:m.b.endAt,d:m.b.date,mf:m.b.movedFrom,seen:m.b.movedSeen,at:m.b.movedAt}));
+ S.blocks=S.blocks.filter(b=>!c.drop.includes(b));
+ for(const m of c.moves){const b=m.b;if(!b.movedFrom)b.movedFrom={startAt:b.startAt,endAt:b.endAt};b.startAt=m.startAt.toISOString();b.endAt=m.endAt.toISOString();b.date=ymd(m.startAt);b.movedAt=nowIso();b.movedSeen=false;b.updatedAt=nowIso()}
+ const ids=c.picks.map(x=>{const id=uid();S.blocks.push({id,type:'task',taskId:t.id,title:'',startAt:x.startAt.toISOString(),endAt:x.endAt.toISOString(),date:x.date,plannedMin:Math.round((x.endAt-x.startAt)/6e4),origin:'auto',auto:true,status:'planned',createdAt:nowIso(),updatedAt:nowIso()});return id});
+ const back=restoreMoved(S.blocks,now);t.plan.stale=false;
+ return{c,ids,moved:c.moves.length,restored:back.length,revert(){for(const q of prev){q.b.startAt=q.s;q.b.endAt=q.e;q.b.date=q.d;if(q.mf)q.b.movedFrom=q.mf;else delete q.b.movedFrom;q.b.movedSeen=q.seen;q.b.movedAt=q.at}for(const x of back){x.b.startAt=x.from;x.b.endAt=new Date(+new Date(x.from)+(+new Date(x.b.endAt)-+new Date(x.b.startAt))).toISOString()}for(const d of dropped)if(!S.blocks.includes(d))S.blocks.push(d)}}}
 function todaySug(t){const now=new Date(),td=ymd(now),c=planCalc(t,S.blocks,now);if(!c)return null;const mine=S.blocks.filter(b=>b.taskId===t.id);
  if(c.rem===0)return{c,done:true};if(mine.some(b=>b.status==='done'&&ymd(new Date(b.startAt))===td))return{c,doneToday:true};
  const o=mine.find(b=>b.status!=='done'&&b.status!=='missed'&&ymd(new Date(b.startAt))===td&&new Date(b.endAt)>now),pk=c.picks.find(x=>x.date===td);
  const nx=mine.filter(b=>b.status!=='done'&&b.status!=='missed'&&new Date(b.endAt)>now).map(b=>b.startAt).sort()[0]||(c.picks.find(x=>x.date>td)||{}).startAt;
  return{c,min:o?dmin(o):pk?Math.round((pk.endAt-pk.startAt)/6e4):0,next:nx}}
-const ICO={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11a2.1 2.1 0 00-3-3L5 16l-1 4z"/></svg>'};
+const ICO={play:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.5 5.6v12.8a1 1 0 001.5.86l10.2-6.4a1 1 0 000-1.72L10 4.74a1 1 0 00-1.5.86z"/></svg>',check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11a2.1 2.1 0 00-3-3L5 16l-1 4z"/></svg>'};
 const needUpd=(p,sg)=>!!sg&&(sg.done?sg.c.drop.length>0:(p.stale||(!sg.c.drop.length&&!sg.c.keep.length))&&sg.c.picks.length>0);
 function detailModal(id,from){const t=tById(id);if(!t)return;curD=id;const p=t.plan,has=p&&p.estMin>0,sg=has?todaySug(t):null;let sug='Add an estimate in Edit Task for a daily suggestion';
  if(sg)sug=sg.done?'All planned work is done':sg.doneToday?"Today's work is logged ✓":sg.min?`Suggested today: <b>${fmt(sg.min)}</b>`:`Nothing needed today${sg.next?' · next '+fdt(sg.next):''}`;
  modal(t.title,`<button class="kb" data-act="more" data-id="${id}" aria-label="More actions" aria-haspopup="true">⋯</button>
  <div class="top" style="margin:0">${badge(t)}<small>${t.dueDate?'Due '+fd(t.dueDate):'No deadline'}</small></div>${pline(t)}
- <p class="sug">${sug}</p>${has?`<small>${fmt(p.doneMin||0)} of ${fmt(p.estMin)} logged</small>`:''}${sg&&sg.c.atRisk&&!sg.done?`<small class="warn">Tight schedule. See Schedule.</small>`:''}
+ <p class="sug">${sug}</p>${sg&&sg.c.atRisk&&!sg.done?`<small class="warn">Tight schedule. See Schedule.</small>`:''}
+ ${has?(()=>{const dn=p.doneMin||0,rm=Math.max(0,p.estMin-dn),up=S.blocks.filter(b=>b.taskId===id&&b.type!=='break'&&b.status!=='done'&&b.status!=='missed'&&new Date(b.endAt)>new Date()).sort((a,b)=>a.startAt<b.startAt?-1:1),ms=S.blocks.filter(b=>b.taskId===id&&b.status==='missed').length;
+  return`<div class="grid2"><div><small>Work completed</small><b>${fmt(dn)}</b></div><div><small>Work remaining</small><b>${fmt(rm)}</b></div></div>
+  ${ms&&rm>0?`<div class="pvx"><small class="warn">⚠ ${ms} session${ms>1?'s':''} missed. ${fmt(rm)} still to do.</small><button type="button" class="lnk" data-act="review" data-id="${id}">Revise plan</button></div>`:''}
+  <div class="sec">Upcoming sessions</div>${up.length?`<ul class="upl">${up.slice(0,3).map(b=>`<li><span>${fdt(b.startAt)}</span><b>${fmt(dmin(b))}</b></li>`).join('')}${up.length>3?`<li class="mut">+ ${up.length-3} more</li>`:''}</ul>`:'<small class="mut">No sessions scheduled yet.</small>'}`})():''}
  <div class="btns"><button class="btn big" data-act="focusnow" data-id="${id}">Start Focus</button></div>
- <div class="acts"><button data-act="logsheet" data-id="${id}">${ICO.check}Log Work</button><button data-act="schsheet" data-id="${id}">${ICO.cal}Schedule</button><button data-act="editsheet" data-id="${id}">${ICO.pen}Edit Task</button></div>`);
+ <div class="acts"><button data-act="logsheet" data-id="${id}">${ICO.check}Log Work</button><button data-act="viewfocus" data-id="${id}">${ICO.cal}View Focus Schedule</button><button data-act="editplan" data-id="${id}">${ICO.pen}Edit Plan</button><button data-act="schsheet" data-id="${id}">${ICO.cal}Plan details</button></div>`);
  if(from!==undefined){const i=$('#modal .pl i');if(i){const to=i.style.width;i.style.width=from+'%';void i.offsetWidth;requestAnimationFrame(()=>{i.style.width=to})}}}
 function logSheet(id){const t=tById(id),sg=t.plan&&t.plan.estMin?todaySug(t):null,v=(sg&&sg.min)||30;
  sheet('Log work',`<small>How long did you work on “${esc(t.title)}”?</small><div class="chips">${[15,30,45,60].map(x=>`<button class="chip" data-act="qlog" data-v="${x}">${x} min</button>`).join('')}</div>
@@ -591,8 +672,8 @@ function schSheet(id){const t=tById(id),p=t.plan;if(!p||!(p.estMin>0))return she
  sheet('Schedule',`<small>${c.rem===0?'Everything planned is done.':c.picks.length?`${c.picks.length} session(s) · about ${fmt(c.recMin)} each · est. finish ${c.est?fd(c.est):'—'}`:'No sessions to add right now.'}</small>
  ${upd?`<div class="btns"><button class="btn big" data-act="review" data-id="${id}">Review &amp; update schedule</button></div>`:'<p class="mut">✓ Your schedule is up to date.</p>'}
  <div class="sec">Preferences</div><label>Workdays</label><div class="dchips">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" class="sp-d" value="${d}"${pp.days.includes(d)?' checked':''}>${DN[d]}</label>`).join('')}</div>
- <div class="grid2"><div><label for="sp-s">Preferred start</label><select id="sp-s">${opts(slots,pp.start)}</select></div><div><label for="sp-l">Longest session</label><select id="sp-l">${opts([30,45,60,90,120,180].map(x=>[x,x+' min']),pp.sessionMin)}</select></div></div>
- <label for="sp-t">Finish-by date (optional)</label><input type="date" id="sp-t" value="${pp.target||''}"><label for="sp-o">Scheduling</label><select id="sp-o">${opts([['auto','Automatic: plan sessions for me'],['manual','Manual: I schedule sessions myself']],pp.mode)}</select>
+ <div class="grid2"><div><label for="sp-s">Preferred start</label><select id="sp-s">${opts(slots,pp.start)}</select></div><div><label for="sp-l">Longest session</label><select id="sp-l">${opts([15,20,30,45,60,90,120,180].concat([15,20,30,45,60,90,120,180].includes(pp.sessionMin)?[]:[pp.sessionMin]).map(x=>[x,x+' min']),pp.sessionMin)}</select></div></div>
+ <label for="sp-u">Available until (optional)</label><select id="sp-u">${opts([['','Default (11:00 PM)']].concat(slots.filter(q=>q[0]>='07:00')),pp.until||(pp.winE&&pp.winE!=='23:00'?pp.winE:''))}</select><label for="sp-o">Scheduling</label><select id="sp-o">${opts([['auto','Automatic: plan sessions for me'],['manual','Manual: I schedule sessions myself']],pp.mode)}</select>
  <div class="err" id="merr"></div><div class="btns"><button class="btn g" data-act="savepref" data-id="${id}">Save preferences</button></div>
  <details><summary>How this plan was calculated</summary><ul>${c.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>`)}
 function editSheet(id){const t=tById(id),e=t.plan?t.plan.estMin:0;
@@ -638,21 +719,31 @@ let tmr={open:false,done:null,adj:false},wlk=null;const TC=2*Math.PI*124;
 const sessMs=z=>z.elapsed+(z.resumedAt?Date.now()-z.resumedAt:0);
 const clock=ms=>{const t=Math.max(0,Math.ceil(ms/1e3)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=t%60;return(h?h+':'+pad(m):m)+':'+pad(x)};
 function recDur(t){const g=t.plan&&t.plan.estMin?(todaySug(t)||{}).min:0;return Math.min(120,Math.max(5,g||25))}
+const blockMin=id=>{const b=S.blocks.find(x=>x.id===id);return b?Math.max(5,dmin(b)):30};
+/* One-tap Play on a calendar block: opens Focus Mode for the block's linked task with the block's planned duration. Never two sessions at once. */
+function playBlock(id){const b=S.blocks.find(x=>x.id===id),t=b&&tById(b.taskId);if(!t||b.type==='break'||b.status==='done')return;
+ if(S.sess){if(S.sess.blockId===id){tmr.open=true;return renderTimer()}
+  const cur=tById(S.sess.taskId),left=Math.max(0,Math.round((S.sess.plannedMs-sessMs(S.sess))/6e4));
+  return modal('Focus session in progress',`<p><b>${esc(cur?cur.title:'A session')}</b> is running (${left} min left). Only one session can run at a time.</p><div class="btns"><button class="btn" data-act="resumesess">Resume it</button><button class="btn g" data-act="switchsess" data-id="${id}">End it &amp; start “${esc(t.title)}”</button><button class="btn g" data-act="close">Cancel</button></div><small class="mut">Ending logs the minutes you already focused.</small>`)}
+ startFocus({blockId:id,min:blockMin(id)})}
 function startFocus(o){audio();if(S.sess){toast('A focus session is already running');tmr.open=true;return renderTimer()}
  let b=o.blockId&&S.blocks.find(x=>x.id===o.blockId);const t=tById(o.taskId||(b&&b.taskId));if(!t)return;
  const now=Date.now(),dur=o.min||(b?(+new Date(b.startAt)>now?dmin(b):Math.max(5,Math.ceil((new Date(b.endAt)-now)/6e4))):recDur(t));
  if(!b){const s=new Date();s.setSeconds(0,0);b={id:uid(),type:'task',taskId:t.id,title:'',startAt:s.toISOString(),endAt:new Date(+s+dur*6e4).toISOString(),auto:false,status:'planned',adhoc:true,createdAt:nowIso(),updatedAt:nowIso()};S.blocks.push(b)}
  S.sess={id:uid(),blockId:b.id,taskId:t.id,startedAt:nowIso(),plannedMs:dur*6e4,elapsed:0,resumedAt:now,seed:(Math.random()*4294967296)>>>0,jl:routeLength(dur*60),mv:{state:'idle',base:0,next:MV().every*6e4}};save();closeM();tmr={open:true,done:null,adj:false};renderTimer();render()}
 /* Logs once per session id (ledger), so resuming, reloading or syncing can never double-count. */
+/* When logged work reaches the estimate: workload is 100% (task itself is NOT marked done); future, unstarted, auto-generated sessions are removed. Completed and manual sessions stay. */
+function settleWorkload(t){const p=t&&t.plan;if(!p||!(p.estMin>0)||(p.doneMin||0)<p.estMin)return null;const now=Date.now(),gone=S.blocks.filter(b=>b.taskId===t.id&&b.auto&&!b.locked&&b.origin!=='manual'&&(!b.status||b.status==='planned')&&+new Date(b.startAt)>now);
+ if(gone.length)S.blocks=S.blocks.filter(b=>!gone.includes(b));p.stale=false;const back=gone.length?restoreMoved(S.blocks,new Date()):[];return{gone,back,msg:'Planned workload complete ✓'+(gone.length?' · '+gone.length+' upcoming session'+(gone.length>1?'s':'')+' cleared':'')+(back.length?' · '+back.length+' moved session'+(back.length>1?'s':'')+' returned to '+(back.length>1?'their':'its')+' original time':'')}}
 function finishSession(done){const z=S.sess;if(!z)return null;S.sess=null;const L=(S.focusLog=S.focusLog||{}),b=S.blocks.find(x=>x.id===z.blockId),t=tById(z.taskId),ms=done?z.plannedMs:Math.min(z.plannedMs,sessMs(z)),m=Math.round(ms/6e4);
  if(L[z.id]){save();return{m:0}}
- if(b&&t&&b.type!=='break'&&m>=1){const pv={st:b.status,w:b.workedMin,e:b.endAt,had:!!t.plan,d:t.plan&&t.plan.doneMin,sl:t.plan&&t.plan.stale};
+ if(b&&t&&b.type!=='break'&&m>=1){const pv={st:b.status,w:b.workedMin,e:b.endAt,had:!!t.plan,d:t.plan&&t.plan.doneMin,sl:t.plan&&t.plan.stale},was=t.plan&&t.plan.doneMin||0;
   if(b.adhoc&&!done&&Date.now()<+new Date(b.endAt))b.endAt=nowIso();
-  b.status='done';b.workedMin=m;t.plan=t.plan||{...DEFP};t.plan.doneMin=(t.plan.doneMin||0)+m;t.plan.stale=true;t.updatedAt=nowIso();L[z.id]={t:t.id,m,at:nowIso()};save();
-  return{m,undo:()=>{b.status=pv.st;b.workedMin=pv.w;b.endAt=pv.e;if(pv.had){t.plan.doneMin=pv.d||0;t.plan.stale=pv.sl}else t.plan=null;delete L[z.id];save();render()}}}
+  const prevM=b.status==='done'?(b.workedMin||0):0;b.status='done';b.workedMin=m;b.actualMin=m;t.plan=t.plan||{...DEFP};t.plan.doneMin=Math.max(0,(t.plan.doneMin||0)-prevM)+m;t.plan.stale=true;t.updatedAt=nowIso();L[z.id]={t:t.id,m,at:nowIso()};const wl=was<(t.plan.estMin||0)?settleWorkload(t):null;save();
+  return{m,wl:wl&&wl.msg,undo:()=>{if(wl)S.blocks.push(...wl.gone);b.status=pv.st;b.workedMin=pv.w;b.endAt=pv.e;if(pv.had){t.plan.doneMin=pv.d||0;t.plan.stale=pv.sl}else t.plan=null;delete L[z.id];save();render()}}}
  if(b&&b.adhoc)S.blocks=S.blocks.filter(x=>x!==b);save();return{m:0}}
 function checkDone(){const z=S.sess;if(!z||!z.resumedAt||sessMs(z)<z.plannedMs)return;const t=tById(z.taskId),nm=t?t.title:'Focus',pm=Math.round(z.plannedMs/6e4),endAt=z.resumedAt+(z.plannedMs-z.elapsed),fresh=Date.now()-endAt<9e4,r=finishSession(true);
- render();flash();if(fresh)play('done');notify('Focus session complete',nm+' · '+(r&&r.m?r.m:pm)+' min logged');
+ if(r&&r.wl)setTimeout(()=>toast(r.wl),900);render();flash();if(fresh)play('done');notify('Focus session complete',nm+' · '+(r&&r.m?r.m:pm)+' min logged');
  jr.dt=performance.now();tmr={open:true,done:{name:nm,m:r?r.m:0,taskId:z.taskId,planMin:pm,undo:r&&r.undo,seed:z.seed||jhash(z.id),jl:z.jl||routeLength(z.plannedMs/1e3),sid:z.id},adj:false};renderTimer()}
 function renderTimer(){const el=$('#timer'),z=S.sess;
  if(!tmr.open||(!z&&!tmr.done)){tmr.open=false;el.style.display='none';el.innerHTML='';el.classList.remove('jm');if(jr.raf){cancelAnimationFrame(jr.raf);jr.raf=0}cancelAnimationFrame(jr.rt);pillUpd();wl();setLogo();renderMvp();return}
@@ -754,39 +845,49 @@ const ACT={
  jreplay(){jrReplay(false)},
  testsnd(d){play(d.k==='move'?'move':'done',true)},
  pvstart(d){const e=$('#pl-s');if(e){e.value=d.t;e.dispatchEvent(new Event('change',{bubbles:true}))}},
+ pvfix(d){const set=(id,v)=>{const e=$(id);if(e){e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))}},det=document.querySelector('#modal details.mo');
+  if(d.k==='l'){if(![...$('#pl-l').options].some(o=>o.value===String(d.v))){$('#pl-lc').value=d.v;set('#pl-l','custom')}else set('#pl-l',d.v)}
+  else if(d.k==='pd')set('#pl-pd',d.v);else if(d.k==='days'){document.querySelectorAll('.pl-d').forEach(x=>x.checked=true);planPreview()}
+  else if(d.k==='skip'){$('#pl-so').checked=true;planPreview()}else if(d.k==='est'){$('#pl-h').focus();$('#pl-h').scrollIntoView({block:'center'})}},
  pvopen(){const m=document.querySelector('#modal details.mo'),e=$('#pl-s');if(m)m.open=true;if(e){e.scrollIntoView({block:'center'});e.focus()}},
  notifperm(){try{if(window.FocusyNative&&FocusyNative.native)FocusyNative.ask().then(()=>render());else Notification.requestPermission().then(()=>render())}catch(e){}},
- review(d){reviewModal(d.id)},logwork(d){logModal('',d.t)},blockdone(d){logModal(d.id)},
+ review(d){reviewModal(d.id)},editplan(d){closeM();taskModal(d.id)},viewfocus(d){const b=S.blocks.filter(x=>x.taskId===d.id&&x.status!=='done'&&x.status!=='missed'&&new Date(x.endAt)>new Date()).sort((a,c)=>a.startAt<c.startAt?-1:1)[0];closeM();fdate=b?ymd(new Date(b.startAt)):today();view='focus';render();scrollTo(0,0)},logwork(d){logModal('',d.t)},blockdone(d){logModal(d.id)},
  applyplan(d){const t=tById(d.id),r=t&&applyFor(t);if(!r)return;save();closeSheet();render();if(curD)detailModal(curD);toast(r.ids.length+' session(s) added to Focus')},
- focusnow(d){startFocus({taskId:d.id})},focustask(d){startFocus({taskId:d.id,min:+d.m||0})},startblock(d){startFocus({blockId:d.id})},
+ focusnow(d){startFocus({taskId:d.id})},focustask(d){startFocus({taskId:d.id,min:+d.m||0})},startblock(d){startFocus({blockId:d.id})},playblock(d){playBlock(d.id)},switchsess(d){const r=finishSession(false);flash();if(r&&r.m>=1)toast('Logged '+r.m+' min for the previous session');closeM();startFocus({blockId:d.id,min:blockMin(d.id)})},resumesess(){closeM();tmr.open=true;renderTimer()},
  topen(){tmr.open=true;tmr.adj=false;renderTimer()},tmin(){tmr.open=false;renderTimer()},tclose(){tmr={open:false,done:null,adj:false};renderTimer()},
  tpause(){const z=S.sess;if(z.mv&&(z.mv.state==='break'||z.mv.state==='ready')){tmr.open=true;return renderTimer()}if(z.resumedAt){z.elapsed+=Date.now()-z.resumedAt;z.resumedAt=null}else z.resumedAt=Date.now();save();renderTimer();render()},
  tadjust(){tmr.adj=!tmr.adj;renderTimer()},tdur(d){setPlanned(+d.v)},tadj(d){setPlanned(Math.round(S.sess.plannedMs/6e4)+(+d.v))},
- tstop(){const r=finishSession(false);flash();tmr={open:false,done:null,adj:false};renderTimer();render();if(r&&r.m>=1)toast('Logged '+r.m+' min',r.undo);else toast('Session ended')},
+ tstop(){const r=finishSession(false);flash();tmr={open:false,done:null,adj:false};renderTimer();render();if(r&&r.m>=1)toast('Logged '+r.m+' min'+(r.wl?' · '+r.wl:''),r.undo);else toast('Session ended')},
  logsheet(d){logSheet(d.id)},schsheet(d){schSheet(d.id)},editsheet(d){editSheet(d.id)},qlog(d){$('#lg').value=d.v},closesheet(d,el,e){if(e.target===el)closeSheet()},
  editall(d){taskModal(d.id)},donetask(d){toggle(d.id);closeM()},
  more(d,el){const o=$('.pop');if(o)return o.remove();const t=tById(d.id);$('.md').insertAdjacentHTML('beforeend',`<div class="pop" role="menu"><button role="menuitem" data-act="donetask" data-id="${d.id}">${t.status==='done'?'Reopen task':'Mark complete'}</button><button role="menuitem" data-act="editall" data-id="${d.id}">More details…</button><button role="menuitem" class="dng" data-act="deltask" data-id="${d.id}">Delete task</button></div>`)},
- savepref(d){const t=tById(d.id),days=[...document.querySelectorAll('.sp-d:checked')].map(x=>+x.value),tg=$('#sp-t').value;
-  if(!days.length)return merr('Pick at least one workday.');if(tg&&t.dueDate&&tg>t.dueDate)return merr('Finish-by must be on or before the deadline.');
-  t.plan={...t.plan,target:tg,days,start:$('#sp-s').value,sessionMin:+$('#sp-l').value,mode:$('#sp-o').value,stale:true};t.updatedAt=nowIso();save();render();schSheet(d.id)},
+ savepref(d){const t=tById(d.id),days=[...document.querySelectorAll('.sp-d:checked')].map(x=>+x.value),un=$('#sp-u').value;
+  if(!days.length)return merr('Pick at least one workday.');if(un&&hmN(un)<=hmN($('#sp-s').value))return merr('Available until must be later than the preferred start time.');
+  t.plan={...t.plan,until:un,days,start:$('#sp-s').value,sessionMin:+$('#sp-l').value,mode:$('#sp-o').value,stale:true};t.updatedAt=nowIso();save();render();schSheet(d.id)},
  saveedit(d){const t=tById(d.id),title=$('#ed-t').value.trim(),due=$('#ed-d').value,v=(+$('#ed-h').value||0)*60+(+$('#ed-m').value||0);
   if(!title)return merr('Please enter a task name.');if(v&&!due)return merr('Set a deadline to plan the work.');
   const old=Math.round(prog(t)*100),dc=due!==(t.dueDate||'');t.title=title;t.dueDate=due;
   if(v||t.plan){const o=t.plan||{};t.plan={...DEFP,...o,estMin:v,stale:!t.plan||!!o.stale||dc||o.estMin!==v};if(t.plan.target&&due&&t.plan.target>due)t.plan.target=''}
-  t.updatedAt=nowIso();let r=null;if(t.plan&&t.plan.estMin>0&&t.plan.mode==='auto'){const c=planCalc(t,S.blocks,new Date());if(c&&!c.drop.length&&!c.keep.length)r=applyFor(t)}
-  save();closeSheet();render();detailModal(d.id,old);if(r&&r.ids.length)toast('Plan: '+fmt(r.c.recMin)+' a day · '+r.ids.length+' sessions in Focus',()=>{S.blocks=S.blocks.filter(b=>!r.ids.includes(b.id));t.plan.stale=true;save();render()})},
- savelog(d){const m=Math.max(0,+$('#lg').value||0),t=tById(d.t),b=d.b&&S.blocks.find(x=>x.id===d.b),old=Math.round(prog(t)*100);if(b){b.status='done';b.workedMin=m}
-  t.plan=t.plan||{...DEFP};t.plan.doneMin=(t.plan.doneMin||0)+m;t.plan.stale=true;t.updatedAt=nowIso();save();closeM();render();if(!d.b)detailModal(d.t,old)},
+  t.updatedAt=nowIso();let r=null;if(t.plan&&t.plan.estMin>0&&t.plan.mode==='auto'){const c=planFor(t);if(c&&!c.drop.length&&!c.keep.length)r=applyFor(t)}
+  save();closeSheet();render();detailModal(d.id,old);if(r&&r.ids.length)toast('Plan: '+fmt(r.c.recMin)+' a day · '+r.ids.length+' sessions in Focus'+(r.moved?' · '+r.moved+' lower-priority session'+(r.moved>1?'s':'')+' moved':''),()=>{S.blocks=S.blocks.filter(b=>!r.ids.includes(b.id));r.revert&&r.revert();t.plan.stale=true;save();render()})},
+ savelog(d){const m=Math.max(0,+$('#lg').value||0),t=tById(d.t),b=d.b&&S.blocks.find(x=>x.id===d.b),old=Math.round(prog(t)*100);let prevM=0;if(b){prevM=b.status==='done'?(b.workedMin||0):0;b.status='done';b.workedMin=m;b.actualMin=m}
+  t.plan=t.plan||{...DEFP};const was=t.plan.doneMin||0;t.plan.doneMin=Math.max(0,was-prevM)+m;t.plan.stale=true;t.updatedAt=nowIso();const wl=was<t.plan.estMin?settleWorkload(t):null;save();closeM();render();if(!d.b)detailModal(d.t,old);if(wl)toast(wl.msg,()=>{S.blocks.push(...wl.gone);save();render()})},
  close(d,el,e){if(e.target===el)closeM()},newtask(){taskModal()},newblock(){blockModal()},editblock(d){blockModal(d.id)},prio(d){prioModal(d.d)},
  savetask(d){const title=$('#m-t').value.trim();if(!title)return merr('Please enter a task title.');
   const f={title,notes:$('#m-n').value,important:unt($('#m-i').value),urgent:unt($('#m-u').value),dueDate:$('#m-d').value,scheduledDate:$('#m-s').value};
   const old=d.id?tById(d.id):null,pl=readPlan(f.dueDate);if(pl&&pl.err)return merr(pl.err);
-  if(pl){const o=old&&old.plan||{},key=x=>JSON.stringify([x.estMin,x.target,x.days,x.start,x.sessionMin,x.mode]);f.plan={...DEFP,...o,...pl,stale:!!o.stale||key(o)!==key(pl)||(!!old&&old.dueDate!==f.dueDate)}}else f.plan=null;
-  if(d.id){Object.assign(old,f,{updatedAt:nowIso()});save();closeM();render()}
+  if(pl){const o=old&&old.plan||{},key=x=>JSON.stringify([x.estMin,x.from,x.days,x.start,x.sessionMin,x.perDay,x.until||x.winE||'',x.skipOv,x.mode]);f.plan={...DEFP,...o,...pl,stale:!!o.stale||key(o)!==key(pl)||(!!old&&old.dueDate!==f.dueDate)}}else f.plan=null;
+  if(d.id){Object.assign(old,f,{updatedAt:nowIso()});let r=null,rv=false;const nowD=new Date(),own=b=>b.taskId===old.id&&b.auto&&!b.locked&&(!b.status||b.status==='planned')&&new Date(b.endAt)>nowD;
+   if(old.plan&&old.plan.estMin>0&&(old.plan.doneMin||0)>=old.plan.estMin){const w=settleWorkload(old);if(w&&w.gone.length)toast(w.msg)}
+   else if(old.plan&&old.plan.estMin>0&&old.plan.mode==='auto'){const c=planFor(old,nowD);
+    if(c&&c.drop.length&&!samePlan(c)){old.plan.stale=true;rv=true}else if(c&&c.drop.length){old.plan.stale=false}else r=applyFor(old)}
+   else S.blocks=S.blocks.filter(b=>!own(b));
+   save();closeM();render();if(rv)reviewModal(old.id);else if(r&&r.ids.length)toast('Plan: '+fmt(r.c.recMin)+' a day · '+r.ids.length+' sessions in Focus'+(r.moved?' · '+r.moved+' lower-priority session'+(r.moved>1?'s':'')+' moved':''))}
   else{const nt=addTask(f),r=nt.plan&&nt.plan.mode==='auto'?applyFor(nt):null;save();closeM();render();
-   if(r&&r.ids.length)toast('Plan: '+fmt(r.c.recMin)+' a day · '+r.ids.length+' sessions in Focus',()=>{S.blocks=S.blocks.filter(b=>!r.ids.includes(b.id));nt.plan.stale=true;save();render()})}},
+   if(r&&r.ids.length)toast('Plan: '+fmt(r.c.recMin)+' a day · '+r.ids.length+' sessions in Focus'+(r.moved?' · '+r.moved+' lower-priority session'+(r.moved>1?'s':'')+' moved':''),()=>{S.blocks=S.blocks.filter(b=>!r.ids.includes(b.id));r.revert&&r.revert();nt.plan.stale=true;save();render()})}},
  deltask(d,el){if(!el.dataset.armed){el.dataset.armed=1;el.textContent='Tap again to confirm';return}
-  const t=tById(d.id);t.deletedAt=nowIso();S.blocks=S.blocks.filter(b=>b.taskId!==d.id);for(const k in S.prio)if(S.prio[k].taskId===d.id)delete S.prio[k];save();closeM();render()},
+  const t=tById(d.id);t.deletedAt=nowIso();S.blocks=S.blocks.filter(b=>b.taskId!==d.id);for(const k in S.prio)if(S.prio[k].taskId===d.id)delete S.prio[k];const back=restoreMoved(S.blocks,new Date());save();closeM();render();if(back.length)toast(back.length+' moved session'+(back.length>1?'s':'')+' returned to '+(back.length>1?'their':'its')+' original time')},
+ ackmove(d){const b=S.blocks.find(x=>x.id===d.id);if(b){b.movedSeen=true;save();render()}},
  saveblock(d){const type=$('#b-y').value,link=$('#b-l').value,title=$('#b-t').value.trim(),date=$('#b-d').value,st=$('#b-s').value;
   const dur=Math.max(15,Math.round((+$('#b-m').value||15)/15)*15);if(!date)return merr('Choose a date.');
   let taskId=null,label=title;
@@ -794,6 +895,7 @@ const ACT={
   else label=title||'Break';
   const s=new Date(date+'T'+st),e=new Date(+s+dur*6e4);
   if(d.id)Object.assign(S.blocks.find(b=>b.id===d.id),{type,taskId,title:label,startAt:s.toISOString(),endAt:e.toISOString(),auto:false,updatedAt:nowIso()});
+  if(d.id){const q=S.blocks.find(b=>b.id===d.id),kk=$('#b-k');if(q&&kk){if(kk.checked)q.locked=true;else delete q.locked}if(q&&q.movedFrom&&(q.startAt!==q.movedFrom.startAt)){q.movedSeen=true}}
   else S.blocks.push({id:uid(),type,taskId,title:label,startAt:s.toISOString(),endAt:e.toISOString(),createdAt:nowIso(),updatedAt:nowIso()});
   fdate=date;save();closeM();render()},
  delblock(d){S.blocks=S.blocks.filter(b=>b.id!==d.id);if(S.sess&&S.sess.blockId===d.id)S.sess=null;save();closeM();render()},
@@ -822,6 +924,8 @@ document.addEventListener('click',e=>{if(!e.target.closest('.pop,.kb')){const pp
  const el=e.target.closest('[data-nav],[data-tog],[data-edit],[data-open],[data-act],[data-f]');if(!el)return;const d=el.dataset;
  if(d.nav){view=d.nav;render();scrollTo(0,0)}else if(d.tog)toggle(d.tog);else if(d.edit)taskModal(d.edit);else if(d.open)detailModal(d.open);
  else if(d.f){dlf=d.f;render()}else if(ACT[d.act])ACT[d.act](d,el,e)});
+/* A scheduling transaction can never run twice at once (double tap, re-entrant click): the second call is ignored until the first has fully finished. */
+['savetask','applyplan','switchsess'].forEach(k=>{const f=ACT[k];if(!f)return;let busy=false;ACT[k]=function(...a){if(busy)return;busy=true;try{return f.apply(this,a)}finally{busy=false}}});
 document.addEventListener('keydown',e=>{const a=document.activeElement,typing=a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);
  if(e.key==='Escape'){if(tmr.open&&S.sess){tmr.open=false;renderTimer()}else if($('.sheetov'))closeSheet();else closeM()}
  if((e.key==='Enter'||e.key===' ')&&a&&a.getAttribute('role')==='button'){e.preventDefault();a.click();return}
@@ -834,7 +938,8 @@ document.addEventListener('keydown',e=>{const a=document.activeElement,typing=a&
 document.addEventListener('input',e=>{if(e.target.id==='dq'){dlq=e.target.value;$('#dl').innerHTML=dlist()}});
 document.addEventListener('change',e=>{const pp=e.target.dataset.p;if(pp){const[a,b]=pp.split('.'),el=e.target;S.set[a]={...S.set[a],[b]:el.type==='checkbox'?el.checked:Number(el.value)};save();render();return}const k=e.target.dataset.set;if(k){S.set[k]=k==='weekStart'?+e.target.value:e.target.value;save();render()}});
 
-function render(){
+function render(){{const live=new Set(S.tasks.filter(t=>!t.deletedAt).map(t=>t.id)),n=S.blocks.length;S.blocks=S.blocks.filter(b=>!b.taskId||live.has(b.taskId));if(S.blocks.length!==n)save()}
+
  const r=document.documentElement;S.set.theme==='auto'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',S.set.theme);
  $('#nav').innerHTML=BRAND+V.map(([k,l,i])=>`<button class="nv${k===view?' on':''}${k==='one'?' hm':''}" data-nav="${k}" ${k===view?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}</button>`).join('');
  document.body.dataset.v=view;const mm=$('#main'),ch=mm.dataset.v!==view;mm.dataset.v=view;mm.classList.toggle('enter',ch);mm.innerHTML=VIEWS[view]();lastNow='';setLogo()}
