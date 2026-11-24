@@ -178,7 +178,7 @@ input[type=range]{padding:0;min-height:36px;accent-color:#6C5CE7}
 body{padding-top:env(safe-area-inset-top,0px)}
 #timer:not(.jm){padding-top:env(safe-area-inset-top,0px)}
 /* ===== Deadlines card (progress ring + pill) ===== */
-body[data-v="deadlines"] #fab,body[data-v="focus"][data-fv="one"] #fab,body[data-v="focus"][data-fv="week"] #fab{display:none}
+body[data-v="deadlines"] #fab,body[data-v="focus"][data-fv="one"] #fab,body[data-v="focus"][data-fv="week"] #fab,body[data-v="focus"][data-fv="day"] #fab{display:none}
 .row.dcard{display:flex;align-items:center;gap:12px;padding:12px 14px}
 .dcard .rt{flex:1;min-width:0}
 .dcard .rt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
@@ -495,6 +495,76 @@ body.scfull .tpo2{grid-column:1/-1;grid-row:5;margin-top:2px}
 .dhd{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:12px}.dhd label{margin:0;min-width:0}.dbt{display:flex;gap:6px;flex:none}.dbt .mini{white-space:nowrap;padding:0 10px;font-size:12.5px}
 .mini{min-height:36px;padding:0 12px;border-radius:99px;border:1px solid rgba(168,139,255,.4);background:transparent;color:#b79bff;font-size:13px;font-weight:700;cursor:pointer}
 .clrw{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.mini.clr{border-color:rgba(248,113,113,.5);color:#fca5a5}
+
+.dtools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px}.dpx{display:grid;gap:8px;margin-bottom:10px}.dps{display:flex;gap:8px;flex-wrap:wrap}.dps span{flex:1 1 70px;display:flex;flex-direction:column;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--bd);font-size:11.5px;color:var(--mut)}.dps b{font-size:16px;color:var(--tx)}.dps .tp b{color:#ffb347}
+.dpr{padding:9px 12px;border-radius:12px;background:rgba(255,93,138,.12);border:1px solid #ff5d8a66;font-size:13px}.dpn{padding:9px 12px;border-radius:12px;background:rgba(255,179,71,.1);border:1px solid #ffb34766;font-size:13px}.dpa{display:flex;gap:8px;flex-wrap:wrap}.dpa .btn{flex:1 1 130px}
+.dayw{display:grid;gap:10px}.pbk{border:1px solid var(--bd);border-radius:16px;background:rgba(139,108,255,.08);overflow:hidden}.pbkt{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:0 14px;background:none;border:0;color:var(--tx);font:inherit;font-weight:700;cursor:pointer;text-align:left}.pbkt span{display:flex;align-items:center;gap:7px;flex:1}.pbkt em{font-style:normal;font-size:12px;color:var(--mut);font-weight:500}.pbkt i{font-style:normal;transition:transform .2s}.pbkt i.op{transform:rotate(180deg)}
+.pbkb{padding:0 10px 10px;display:grid;gap:7px;max-height:280px;overflow:auto;-webkit-overflow-scrolling:touch}.pbkh{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-top:2px}.pbke{padding:6px 4px}.pbkt2{font-size:11.5px}
+.pbki{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:13px;background:rgba(255,255,255,.07);border:1px solid var(--bd);border-left:4px solid var(--p1);cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:pan-y}.pbki.p2{border-left-color:var(--p2)}.pbki.p3{border-left-color:var(--p3)}.pbki.p4{border-left-color:var(--p4)}.pbki.lifted{opacity:.45}
+.pbkn{font-weight:800;font-size:13px;min-width:26px;color:#c9b6ff}.pbkn.fl{color:var(--mut)}.pbkm{flex:1;min-width:0;display:grid;gap:1px}.pbkm b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.pbkm small{font-size:11.5px;color:var(--mut);line-height:1.35}.pbkw{color:#c9b6ff!important}.pbkd{color:var(--tx);font-weight:700}
+.pbkc{display:flex;align-items:center;gap:6px}.pbks{display:grid;gap:2px}.pbks button{border:1px solid var(--bd);background:rgba(255,255,255,.06);color:var(--tx);border-radius:7px;width:30px;height:22px;font-size:10px;cursor:pointer;line-height:1}.pbks button:disabled{opacity:.3}.pbkp{min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--pri);background:var(--pri);color:#fff;font:inherit;font-weight:700;cursor:pointer}.pbkmore{justify-self:start;min-height:36px}
+.wk.day .wkh,.wk.day .wkb{min-width:0;grid-template-columns:52px minmax(0,1fr)}.wk.day .dh{cursor:default}.prot{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,rgba(0,0,0,.28) 0 6px,rgba(0,0,0,.14) 6px 12px);pointer-events:none;z-index:1}.dgn{display:block;margin-top:6px}
+.plsh{display:grid;gap:10px}.plc{display:flex;gap:8px}.plc input{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:0 12px;font:inherit}.aar{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.07)}.aar span{color:#c9b6ff;white-space:nowrap}.ok{color:#5ee09a}
+@media(min-width:820px){.dayw{grid-template-columns:minmax(300px,360px) 1fr;align-items:start}.pbkb{max-height:60vh}.wk.day .wkh,.wk.day .wkb{grid-template-columns:52px minmax(0,1fr)}}
+
+.dayw{gap:8px}.pbk{border-radius:14px}.pbkt{min-height:42px}.pbkb{padding:0 8px 8px;gap:6px;max-height:136px}
+.pbki{padding:5px 6px 5px 10px;gap:8px;min-height:44px;border-radius:12px}.pbki b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.pbkd{font-size:12px;color:var(--mut);white-space:nowrap}
+.pbkp{width:36px;height:36px;min-height:0;padding:0;border-radius:50%;font-size:20px;line-height:1;display:grid;place-items:center;flex:none}
+.wk.day .wb{overflow:hidden}
+@media(min-width:820px){.pbkb{max-height:60vh}}
+
+.dhd{display:flex;align-items:center;gap:2px;margin:2px 0 8px}.dhd button{background:none;border:0;color:var(--tx);font:inherit;cursor:pointer}.dhd>button:not(.dtd){width:40px;height:44px;font-size:26px;line-height:1;display:grid;place-items:center;border-radius:12px}.dhd b{font-size:22px;font-weight:800;padding:0 4px;white-space:nowrap}.dhd .dtd{margin-left:auto;min-height:44px;padding:0 4px;color:var(--mut);font-size:14px}
+.dsh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:4px 2px 8px}.dsh h2{margin:0;font-size:18px}.dsh span{font-size:13px;color:var(--mut)}
+.pbk{background:rgba(255,255,255,.07)}.pbkt{min-height:44px;font-size:17px}.pbkb{max-height:none;padding:0 10px 10px}.pbkh{color:var(--mut);font-size:13px;margin:-4px 0 2px;text-transform:none;letter-spacing:0}
+.pbkg{color:var(--mut);display:grid;flex:none}.pbki{min-height:46px}.pbkd{font-size:13px}.pbkrv{justify-self:start;min-height:36px;font-size:13px}
+.wk.day .wb.fl{border-radius:10px}
+/* manual planner */
+.pbki .pbkg{width:34px;height:40px;display:grid;place-items:center;touch-action:none;cursor:grab;flex:none;margin-left:-6px;border-radius:10px}.pbkg.off{visibility:hidden}.pbkn{font-weight:800;font-size:13px;color:#c9b6ff;min-width:22px}
+.pbkx{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--tx);font:inherit;text-align:left;cursor:pointer;min-height:44px;padding:0}.pbkx b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.pbks{font-size:12px;color:#5ee09a;white-space:nowrap;padding-right:6px}.pbki.pl{opacity:.75}
+.pbkadd{justify-self:start;min-height:40px}.arv{display:block;margin:0 2px 8px;min-height:36px;text-align:left;font-size:13px}
+.adr{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;min-height:48px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--bd);color:var(--tx);font:inherit;cursor:pointer}.adr small{color:var(--mut)}#ad-q{min-height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:0 12px;font:inherit}
+.plc{display:flex;gap:8px}.plc input[type=number]{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:0 12px;font:inherit}.plc .btn{flex:1}
+.wk.day .wb .gr{position:absolute;right:0;top:0;bottom:0;width:46px;display:grid;place-items:center;opacity:.85;touch-action:none;cursor:grab}.wk.day .wb .rs{height:min(24px,45%);z-index:3}.wk.day .wb .rs::after{content:"";position:absolute;left:50%;bottom:4px;width:34px;height:4px;border-radius:2px;background:rgba(255,255,255,.55);transform:translateX(-50%)}
+.wcards{display:grid;gap:8px;grid-template-columns:1fr}.wdc{border:1px solid var(--bd);border-radius:14px;background:rgba(255,255,255,.05);padding:6px 8px 8px;display:grid;gap:5px;cursor:pointer}.wdc.tdy{border-color:#8b6cff;background:rgba(139,108,255,.12)}.wdc.okc{outline:2px dashed #8b6cff;background:rgba(139,108,255,.2)}
+.wdh{display:flex;align-items:baseline;gap:8px;background:none;border:0;color:var(--tx);font:inherit;min-height:34px;padding:0;text-align:left;cursor:pointer}.wdh b{font-size:15px}.wdh span{color:var(--mut);font-size:13px}.wdh em{margin-left:auto;font-style:normal;font-size:13px;font-weight:700;color:#c9b6ff}.wem{color:var(--mut);font-size:12.5px;padding:0 2px 4px}
+.wch{display:grid;grid-template-columns:34px 64px 1fr auto;align-items:center;gap:6px;min-height:42px;padding:2px 8px 2px 0;border-radius:11px;background:linear-gradient(160deg,#2c2160,#1f1748);border:1px solid rgba(170,140,255,.32)}.wch.un{background:transparent;border-style:dashed;opacity:.85}.wch.fx{background:linear-gradient(160deg,#2f7bff55,#1d4fd655);border-color:#8fb8ff66}.wch.dn{opacity:.5}.wch.lifted{opacity:.35}
+.wch b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.wct{font-size:12px;color:#c9b6ff;white-space:nowrap}.wcd{font-size:12px;color:var(--mut)}.wcg{width:34px;height:40px;display:grid;place-items:center;background:none;border:0;color:var(--tx);opacity:.8;touch-action:none;cursor:grab}.wcg.off{visibility:hidden}
+.wgh{position:fixed;z-index:60;width:220px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+@media(min-width:820px){.wcards{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.wch{grid-template-columns:30px 1fr;grid-template-areas:"g t" "b b" "d d";row-gap:0;padding:4px 6px 6px 0}.wch .wcg{grid-area:g;width:30px;height:30px}.wch .wct{grid-area:t}.wch b{grid-area:b;white-space:normal;padding-left:8px}.wch .wcd{grid-area:d;padding-left:8px}}
+.wdc.em{display:flex;align-items:center;gap:8px;min-height:46px;padding-top:2px;padding-bottom:2px}.wdc.em .wem{margin-left:auto;padding:0}
+.wcards{align-items:start}@media(min-width:820px){.wdc.em{display:grid}.wdc.em .wem{margin:0;padding:0 2px 4px}}@media(min-width:1100px){.wcards{grid-template-columns:repeat(7,minmax(0,1fr))}}
+.wdh{flex-wrap:wrap;row-gap:0}.wdh span,.wdh em{white-space:nowrap}.wch .wct{text-align:left}
+
+/* original-style Day timeline, premium pass */
+.wk.day{max-height:calc(100dvh - 300px);min-height:340px;background:linear-gradient(180deg,rgba(20,10,60,.7),rgba(10,5,35,.7))}
+.wk.day .wkb{min-width:0;grid-template-columns:44px minmax(0,1fr)}.wk.day .wkb>.tc,.wk.day .dc{height:calc(24*var(--hh))}
+.wk.day .dc{background-image:repeating-linear-gradient(to bottom,transparent 0 calc(var(--hh) - 1px),rgba(170,140,255,.14) calc(var(--hh) - 1px) var(--hh));border-left:1px solid rgba(170,140,255,.2)}
+.wk.day .hl{font-size:10.5px;right:6px}
+.wk.day .wb{overflow:hidden;border-radius:14px;padding:0;display:flex;align-items:center;gap:8px}
+.wk.day .wb.fl{background:linear-gradient(135deg,rgba(108,92,231,.42),rgba(34,22,86,.95));border:1px solid rgba(170,140,255,.38);border-left:4px solid var(--pc);box-shadow:0 4px 14px rgba(8,3,30,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+.wk.day .wb.fx{border-radius:14px}
+.wk.day .wb .wtl{flex:none;width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.12);display:grid;place-items:center;margin-left:30px}.wk.day .wb:not(.dg) .wtl{margin-left:8px}
+.wk.day .wb .wbb{flex:1;min-width:0;display:grid;gap:1px;padding:2px 0}.wk.day .wb .wbb b{font-size:13.5px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wk.day .wb .wbb small{font-size:11.5px;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk.day .wb.sm .wtl{display:none}.wk.day .wb.sm .wbb{padding-left:34px}.wk.day .wb.sm:not(.dg) .wbb{padding-left:10px}.wk.day .wb.sm .wbb{display:flex;align-items:baseline;gap:8px}.wk.day .wb.sm .wbb b{flex:1}
+.wk.day .wb.big .wbb b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wk.day .wb .gr{position:absolute;left:0;top:0;bottom:0;right:auto;width:30px;display:grid;place-items:center;opacity:.8;touch-action:none;cursor:grab}
+.wba{display:flex;align-items:center;gap:6px;padding-right:8px;flex:none}.wlg{min-height:34px;padding:0 10px;border-radius:99px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.wpl{flex:0 0 34px;width:34px;height:34px;min-width:34px}
+.dsh{align-items:center}.dsh h2{font-size:17px;display:flex;align-items:baseline;gap:8px}.dsh h2 small{font-size:12px;font-weight:500;color:var(--mut)}.dab{min-height:38px;padding:0 14px;font-size:13px}
+.dhd{margin-bottom:4px}.dhd b{font-size:20px}
+.dayw{display:grid;gap:10px;padding-bottom:70px}
+.pbk{position:fixed;left:8px;right:8px;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:4;max-width:560px;margin:0 auto;background:linear-gradient(180deg,rgba(38,24,96,.96),rgba(22,12,62,.97));border:1px solid rgba(170,140,255,.4);border-radius:18px;box-shadow:0 -6px 28px rgba(5,2,25,.55);backdrop-filter:blur(10px)}
+.pbk .pbkt{min-height:44px;font-size:15px}.pbk .pbkb{max-height:min(210px,34vh);overflow:auto}
+body.dragging .pbk .pbkb{opacity:.15}
+@media(min-width:820px){.dayw{grid-template-columns:minmax(0,1fr) 320px;align-items:start;padding-bottom:0}.pbk{position:sticky;top:12px;left:auto;right:auto;bottom:auto;max-width:none;margin:0;order:2;z-index:2}.pbk .pbkb{max-height:60vh}.wk.day{max-height:calc(100vh - 260px)}}
+.wch{border-left:4px solid rgba(170,140,255,.7)}
+.pbkb{grid-template-columns:minmax(0,1fr)}.pbki{min-width:0}
+
+/* final: original Day list + Week forecast */
+.dayw{display:block!important}.rec{margin:14px 0 4px}.rect{display:flex;width:100%;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;color:var(--mut,#b9aee0);font-size:.82rem;cursor:pointer}.rect i{font-style:normal;transition:transform .2s}.rect i.op{transform:rotate(180deg)}
+.recb{display:grid;gap:6px;margin-top:6px}.reci{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:11px;background:rgba(255,255,255,.05);border-left:3px solid var(--p1)}.reci b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.86rem}.reci span{font-size:.76rem;opacity:.75}
+.tl .blk .bt,.tl .blk .blkrs{touch-action:none}.tl .blk{position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.blkrs{position:absolute;left:0;right:0;bottom:0;height:16px;cursor:ns-resize}.blkrs::after{content:'';position:absolute;left:50%;bottom:4px;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:rgba(255,255,255,.28)}.tl .blk.ldg{position:relative;z-index:8;opacity:.92;box-shadow:0 10px 28px rgba(0,0,0,.5);outline:2px solid var(--p1);touch-action:none}
+.ldp{position:fixed;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);z-index:60;background:#2b1f63;border:1px solid #8b6cff;color:#fff;padding:8px 14px;border-radius:999px;font-size:.84rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;text-align:center}.ldp.bad{background:#5a1230;border-color:#ff5d8a}
+.wb.fc{background:repeating-linear-gradient(135deg,rgba(139,108,255,.14) 0 6px,rgba(139,108,255,.05) 6px 12px);border:1.5px dashed rgba(170,140,255,.6);color:#e4dcff;opacity:.9;cursor:pointer}.wb.fc small{opacity:.75}.dh .fct{display:block;color:#b9a6ff;font-size:.66rem}
 </style></head><body>
 <div id="app"><nav id="nav" aria-label="Main"></nav><main id="main"></main></div>
 <button id="fab" data-act="newtask" aria-label="Add task (N)">+</button>
@@ -516,7 +586,7 @@ const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
    Empty preferences are never stored as defaults: empty start = any suitable free time from 9:00 AM; empty length = 30 min (15 for flex); no workdays = any day (for deadline plans). */
 const DEF_SESS=30,FLEX_SESS=15,ANY_START='09:00',FLEX_FROM='08:00',HABIT_DAYS=14,SESS_CHOICES=[3,5,10,15,20,30,45,60,90];
 function schedOf(t){const p=t&&t.plan;if(p&&p.sched)return p.sched;return p&&p.estMin>0&&t.dueDate&&p.mode!=='manual'?'regular':'backlog'}
-const autoOn=t=>!!t&&!!t.plan&&schedOf(t)==='regular'&&t.plan.mode!=='manual';
+const autoOn=t=>!!t&&!!t.plan&&schedOf(t)==='regular'&&t.plan.mode!=='manual'&&!!t.plan.start&&typeof S!=='undefined'&&!!S.set&&S.set.autoCal===true;/* the calendar is never filled automatically; only a hidden legacy switch (S.set.autoCal) re-enables it */
 const ANY_BY_TIER=['09:00','09:00','13:00','16:00'];
 const effP=(p,tier)=>{const q={...DEFP,...(p||{})};if(!Array.isArray(q.days)||!q.days.length)q.days=[0,1,2,3,4,5,6];if(!q.start)q.start=tier>=0&&tier<4?ANY_BY_TIER[tier]:ANY_START;if(!(+q.sessionMin>0))q.sessionMin=q.sched==='flex'?FLEX_SESS:DEF_SESS;q.sessionMin=+q.sessionMin;q.perDay=Math.max(1,+q.perDay||1);return q};
 /* Dates: deadline = last day work may happen (the only cutoff; any old finish-by value is kept on the record but ignored); "start planning from" = first day a session may be placed.
@@ -725,7 +795,7 @@ let storeOK=true;
 const normBlocks=j=>{for(const b of j.blocks||[]){if(!b.origin)b.origin=b.auto?'auto':'manual';if(b.plannedMin==null&&b.startAt)b.plannedMin=Math.round((new Date(b.endAt)-new Date(b.startAt))/6e4)}return j};
 function load(){try{const j=JSON.parse(localStorage.getItem(K));if(j&&Array.isArray(j.tasks))return normBlocks(j)}catch(e){}
  return{tasks:[],blocks:[],prio:{},set:{theme:'dark',weekStart:1},sess:null}}
-let S=load();
+let S=load();try{if(/[?&]autocal=1/.test(location.search)){S.set=S.set||{};S.set.autoCal=true}}catch(_){}/* developer/test switch for the legacy planner; the app never sets it */
 function saveLocal(){try{localStorage.setItem(K,JSON.stringify(S));storeOK=true}catch(e){storeOK=false}}
 function save(){normBlocks(S);S.savedAt=Date.now();saveLocal();pushSoon();try{window.FocusyNative&&FocusyNative.onSave(S.sess?notePlan(S.sess,Date.now(),MV()):[],S)}catch(e){}}
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -787,16 +857,103 @@ function nowCard(){
  if(S.sess){const b=S.blocks.find(x=>x.id===S.sess.blockId);h+=`<div class="btns" style="align-items:center"><span><b>Focus session</b> · ${sessMin()} min${S.sess.resumedAt?'':' (paused)'}<small>${b?esc(btitle(b)):''}</small></span><button class="btn g" data-act="${S.sess.resumedAt?'spause':'sresume'}">${S.sess.resumedAt?'Pause':'Resume'}</button><button class="btn g" data-act="topen">Open</button><button class="btn r" data-act="send">End</button></div>`}
  return h}
 
+/* ---------- Daily plan: forecast, priority bucket, drag-and-drop ----------
+   Focusy recommends WHAT needs attention; the user decides WHEN. Nothing here moves or places a session without an explicit action.
+   Daily ranking lives in S.dplan[date].rank, separate from the P1–P4 matrix classification. */
+const PROT_A=6*60,PROT_B=23*60;/* protected sleep: before 6:00 AM and after 11:00 PM */
+const dpRead=ds=>(S.dplan&&S.dplan[ds])||{rank:[]};
+function dpGet(ds){S.dplan=S.dplan||{};return S.dplan[ds]||(S.dplan[ds]={rank:[],saved:false})}
+/* Does task t still need a session on day ds? Returns minutes to suggest, or null. */
+function needOf(t,ds,now=new Date()){const p=t.plan,s=schedOf(t);if(!p||s==='backlog')return null;const td=ymd(now),dow=new Date(ds+'T00:00').getDay();
+ if(ds<td||(t.dueDate&&ds>t.dueDate))return null;const days=p.days||[];if(days.length&&!days.includes(dow))return null;
+ const ef=effP(p,prioTier(t,td)),len=ef.sessionMin,est=p.estMin||0,rem=est>0?Math.max(0,est-(p.doneMin||0)):null,
+  mine=S.blocks.filter(b=>b.taskId===t.id&&b.type!=='break'&&b.status!=='missed'&&b.status!=='done'&&+new Date(b.endAt)>+now),
+  onDay=mine.filter(b=>ymd(new Date(b.startAt))===ds).length+S.blocks.filter(b=>b.taskId===t.id&&b.status==='done'&&ymd(new Date(b.startAt))===ds).length;
+ if(onDay>=(s==='regular'?ef.perDay:1))return null;
+ if(rem!==null){const planned=mine.reduce((a,b)=>a+dmin(b),0),need=rem-planned;if(need<=0)return null;return{min:Math.max(3,Math.min(len,Math.ceil(need))),need,rem,planned}}
+ return{min:len,need:null,rem:null,planned:0}}
+function dayBucket(ds){const now=new Date(),req=[],flex=[];
+ for(const t of open()){const s=schedOf(t);if(s==='backlog')continue;const n=needOf(t,ds,now);if(!n)continue;(s==='flex'?flex:req).push({t,...n,sc:pkScore(t,null),sv:sev(t),kind:s})}
+ const by=(a,b)=>b.sc-a.sc||((a.t.dueDate||'9')<(b.t.dueDate||'9')?-1:(a.t.dueDate||'9')>(b.t.dueDate||'9')?1:0);req.sort(by);flex.sort(by);
+ const rk=dpRead(ds).rank||[];if(rk.length){const pos=id=>{const i=rk.indexOf(id);return i<0?1e9:i};req.sort((a,b)=>pos(a.t.id)-pos(b.t.id)||by(a,b))}
+ return{req,flex}}
+function dayStats(ds){const td=today(),a=Math.max(+at(ds,'06:00'),ds===td?Date.now():0),z=+at(ds,'23:00');if(z<=a)return{avail:0,planned:0,free:0,actual:0,fixed:0};
+ const L=S.blocks.filter(b=>b.status!=='missed'&&+new Date(b.startAt)<z&&+new Date(b.endAt)>a),
+  union=list=>{const iv=list.map(b=>[Math.max(a,+new Date(b.startAt)),Math.min(z,+new Date(b.endAt))]).filter(x=>x[1]>x[0]).sort((p,q)=>p[0]-q[0]);let m=0,cs=null,ce=0;for(const [s,e] of iv){if(cs===null){cs=s;ce=e}else if(s<=ce)ce=Math.max(ce,e);else{m+=ce-cs;cs=s;ce=e}}if(cs!==null)m+=ce-cs;return m/6e4},
+  fixed=union(L.filter(b=>b.type==='shift')),total=(z-a)/6e4,task=S.blocks.filter(b=>b.taskId&&b.type!=='break'&&b.type!=='shift'&&b.status!=='missed'&&ymd(new Date(b.startAt))===ds);
+ return{avail:Math.max(0,Math.round(total-fixed)),planned:task.reduce((s,b)=>s+dmin(b),0),free:Math.max(0,Math.round(total-union(L))),actual:task.reduce((s,b)=>s+(b.status==='done'?(b.workedMin||b.actualMin||0):0),0),fixed:Math.round(fixed)}}
+function dayRisks(ds,B){const seen=new Set(),out=[],td=today(),ids=[...B.req.map(x=>x.t.id),...S.blocks.filter(b=>b.taskId&&b.type!=='shift'&&b.status!=='missed'&&ymd(new Date(b.startAt))===ds).map(b=>b.taskId)];
+ for(const id of ids){if(seen.has(id))continue;seen.add(id);const t=tById(id);if(!t||t.status==='done'||!t.dueDate)continue;const sv=sev(t),f=t.plan&&t.plan.estMin>0?feas(t):null;
+  if(f&&f.st==='no')out.push({t,lvl:3,why:`Not enough time before ${fd(t.dueDate)}${f.short?': short '+fmt(Math.round(f.short)):''}`});
+  else if(f&&f.st==='risk'&&(sv==='emg'||sv==='urg'))out.push({t,lvl:2,why:`${fmt(Math.round(f.uns||0))} still unscheduled before ${fd(t.dueDate)}`});
+  else if(sv==='emg')out.push({t,lvl:2,why:daysLeft(t.dueDate)<0?'Overdue':'Due today'})}
+ return out.sort((a,b)=>b.lvl-a.lvl)}
+const daySig=ds=>JSON.stringify(S.blocks.filter(b=>b.taskId&&b.type!=='shift'&&b.type!=='break'&&b.status!=='missed'&&ymd(new Date(b.startAt))===ds).map(b=>[b.id,b.startAt,b.endAt]).sort());
+/* Why a [s,e) slot can't be used (null block id = new session). Empty string = fine. */
+function slotWhy(skip,s,e){const ds=ymd(s),m0=s.getHours()*60+s.getMinutes(),m1=m0+Math.round((e-s)/6e4);
+ if(ymd(e)!==ds&&!(e.getHours()===0&&e.getMinutes()===0))return'A session must finish the same day.';
+ if(m0<PROT_A||m1>PROT_B)return'That is in your protected sleep hours (11 PM – 6 AM).';
+ if(+s<Date.now())return'That time has already passed.';
+ const hit=conflicts(occIndex(S.blocks.filter(x=>x!==skip)),ds,+s,+e);if(hit.length){const h=hit[0];return'Conflicts with '+(h.type==='shift'||h.fixed?(h.title||SHK[h.kind]):btitle(h))+' ('+tf(new Date(h.startAt))+'–'+tf(new Date(h.endAt))+').'}return''}
+/* Suggested free start times on the 15-minute grid. Ordering only: nearest the task's preferred start (or its priority's usual part of the day). */
+function daySlots(t,ds,dur,count=4,extra=[]){const nowC=Math.ceil(Date.now()/9e5)*9e5,L=S.blocks.filter(b=>b.status!=='missed').map(b=>[+new Date(b.startAt),+new Date(b.endAt)]).concat(extra),lo=+at(ds,'06:00'),hi=+at(ds,'23:00'),out=[],d=dur*6e4,
+  until=t.plan&&t.plan.until?+at(ds,t.plan.until):0,pref=+at(ds,(t.plan&&t.plan.start)||ANY_BY_TIER[prioTier(t,today())]);
+ for(let s=lo;s+d<=hi;s+=9e5){if(s<nowC)continue;if(until&&s+d>until)continue;if(!L.some(([a,z])=>a<s+d&&s<z))out.push(s)}
+ out.sort((a,b)=>Math.abs(a-pref)-Math.abs(b-pref)||a-b);const pick=[];for(const s of out){if(pick.every(q=>Math.abs(q-s)>=90*6e4)){pick.push(s);if(pick.length>=count)break}}return pick}
+function dayPlace(tid,s,e,quiet){const why=slotWhy(null,s,e);if(why)return why;const t=tById(tid),id=uid();
+ S.blocks.push({id,type:'task',taskId:tid,title:'',startAt:s.toISOString(),endAt:e.toISOString(),date:ymd(s),plannedMin:Math.round((e-s)/6e4),origin:'manual',auto:false,dp:true,status:'planned',createdAt:nowIso(),updatedAt:nowIso()});
+ save();render();toast(`${t?t.title:'Task'} placed at ${tf(s)}`,()=>{S.blocks=S.blocks.filter(b=>b.id!==id);save();render()});return''}
+const dmn=m=>m+' min';const pbkOpen=()=>S.set.pbko===undefined?innerWidth>=820:!!S.set.pbko;
+const planItems=ds=>{const L=(S.dplan&&S.dplan[ds]&&S.dplan[ds].items)||[];return L.filter(i=>{const t=tById(i.t);return t&&t.status!=='done'&&!t.deletedAt})};
+const itemBlocks=(ds,tid)=>S.blocks.filter(b=>b.taskId===tid&&b.type!=='break'&&b.type!=='shift'&&b.status!=='missed'&&ymd(new Date(b.startAt))===ds).sort((p,q)=>p.startAt<q.startAt?-1:1);
+function dpMut(ds,fn){S.dplan=S.dplan||{};const p=S.dplan[ds]=S.dplan[ds]||{};p.items=p.items||[];fn(p.items);save()}
+function dayBucketHTML(ds){const open=pbkOpen(),more=!!S.set.pbkm,L=planItems(ds),vis=more?L:L.slice(0,3);
+ const row=(i,n)=>{const t=tById(i.t),bl=itemBlocks(ds,t.id),pl=bl.length>0;
+  return`<div class="pbki p${ptier(t)+1}${pl?' pl':''}" data-id="${t.id}" data-min="${i.min}">${pl?'<span class="pbkg off"></span>':`<span class="pbkg" role="img" aria-label="Drag ${esc(t.title)} onto the timeline">${pi('grip',16)}</span>`}<span class="pbkn">#${n+1}</span><button type="button" class="pbkx" data-act="itemedit" data-id="${t.id}" aria-label="${esc(t.title)}, ${dmn(i.min)}. Edit length, time and rank"><b>${esc(t.title)}</b><span class="pbkd">${dmn(i.min)}</span></button>${pl?`<span class="pbks">${tf(new Date(bl[0].startAt))}</span>`:`<button type="button" class="pbkp" data-act="pbkplace" data-id="${t.id}" aria-label="Choose a start time for ${esc(t.title)}">+</button>`}</div>`};
+ return`<section class="pbk" aria-label="Tasks to schedule"><button type="button" class="pbkt" data-act="pbktoggle" aria-expanded="${open}"><span>${pi('target',18)} Tasks to Schedule (${L.length})</span><i class="${open?'op':''}">▾</i></button>${open?`<div class="pbkb">${L.length?`<small class="pbkh">Drag ⠿ onto the timeline, or tap + to pick a time</small>${vis.map((i,n)=>row(i,n)).join('')}${L.length>3?`<button type="button" class="lnk pbkmore" data-act="pbkmore">${more?'Show fewer':'Show '+(L.length-3)+' more'}</button>`:''}`:'<small class="pbkh">Choose the tasks you want to work on this day.</small>'}<button type="button" class="lnk pbkadd" data-act="pbkadd">+ Add task</button></div>`:''}</section>`}
+const autoBlocks=()=>S.blocks.filter(b=>b.auto&&!b.locked&&b.type==='task'&&(!b.status||b.status==='planned')&&+new Date(b.endAt)>Date.now());
+const autoReviewHTML=()=>{if(S.set.autoReviewed)return'';const n=autoBlocks().length;return n?`<button type="button" class="lnk arv" data-act="arvopen">${n} auto-generated session${n>1?'s':''} on your calendar · Review</button>`:''};
+function dayGrid(ds){const a=+new Date(ds+'T00:00'),z=a+864e5,now=Date.now(),L=[];
+ for(const b of S.blocks){const s=+new Date(b.startAt),e=+new Date(b.endAt);if(e<=a||s>=z)continue;L.push({b,s:Math.max(s,a),e:Math.min(e,z),a})}L.sort((p,q)=>p.s-q.s||q.e-p.e);
+ let cl=[],end=0;const flush=()=>{const n=Math.max(1,...cl.map(x=>x.l+1));cl.forEach(x=>x.n=n);cl=[]};
+ for(const x of L){if(cl.length&&x.s>=end)flush();let l=0;while(cl.some(y=>y.l===l&&y.e>x.s))l++;x.l=l;cl.push(x);end=Math.max(end,x.e)}if(cl.length)flush();
+ const hours=[...Array(24)].map((_,h)=>`<div class="hl" style="top:${h*60*PPM}px">${h===0?'':new Date(2000,0,1,h).toLocaleTimeString([],{hour:'numeric'})}</div>`).join(''),td=today(),dt=new Date(ds+'T00:00');
+ const prot=`<i class="prot" style="top:0;height:${PROT_A*PPM}px"></i><i class="prot" style="top:${PROT_B*PPM}px;height:${(1440-PROT_B)*PPM}px"></i>`,free=freeGaps(L,a,z,ds===td?now:0);
+ return`<div class="wk day" id="wk" style="--hh:${60*PPM}px"><div class="wkb"><div class="tc">${hours}</div><div class="dc${ds===td?' tdy':''}" data-d="${ds}">${prot}${free}${L.map(x=>wblock(x,ds,1)).join('')}${ds===td?`<i class="nowl" style="top:${(now-a)/6e4*PPM}px"></i>`:''}</div></div></div>`}
+
+function recHTML(ds){const o=!!S.set.recOpen;let L=[];try{const b=dayBucket(ds);L=[...b.req,...b.flex].slice(0,6)}catch(_){}
+ return`<section class="rec" aria-label="Recommended tasks (optional)"><button type="button" class="rect" data-act="rectoggle" aria-expanded="${o}"><span>Recommended tasks${L.length?' ('+L.length+')':''} · optional</span><i class="${o?'op':''}">▾</i></button>${o?`<div class="recb">${L.length?L.map(x=>`<div class="reci p${ptier(x.t)+1}"><b>${esc(x.t.title)}</b><span>${x.min} min</span><button type="button" class="chip" data-act="recplace" data-id="${x.t.id}" data-m="${x.min}" aria-label="Choose a time for ${esc(x.t.title)}">+ Add</button></div>`).join(''):'<small class="mut">Nothing suggested for this day. Nothing is ever added for you.</small>'}</div>`:''}</section>`}
+let fcK='',fcV={};
+function fcWeek(days){if(S.set.noFc)return{};const key=days[0]+'|'+S.savedAt+'|'+S.blocks.length+'|'+S.tasks.length+'|'+Math.floor(Date.now()/6e5);if(key===fcK)return fcV;const lo=open(),out={},tmp=[],n0=S.blocks.length;try{const now=new Date();for(const t of lo.filter(t=>t.plan&&t.plan.estMin>0&&schedOf(t)!=='backlog').sort((x,y)=>(x.dueDate||'9')<(y.dueDate||'9')?-1:1).slice(0,4)){const c=planFor(t,now);if(!c)continue;for(const p of c.picks||[]){if(days.includes(p.date))(out[p.date]=out[p.date]||[]).push({t,p});const q={...p,id:'fc'+tmp.length,type:'task',taskId:t.id,status:'planned',auto:true,locked:false};tmp.push(q);S.blocks.push(q)}}}catch(_){}finally{S.blocks.length=n0}fcK=key;fcV=out;return out}
+let ld=null;
+function ldMin(){const d=ld,dy=(d.py+scrollY)-(d.y0+d.sy),steps=Math.round(dy/(1.2*SNAP)),dl=steps*SNAP,s0=new Date(d.b.startAt),e0=new Date(d.b.endAt);let s,e;
+ if(d.mode==='move'){s=new Date(+s0+dl*6e4);e=new Date(+e0+dl*6e4)}else{s=s0;e=new Date(+e0+dl*6e4);if(e-s<SNAP*6e4)e=new Date(+s+SNAP*6e4)}
+ return{s,e,dy:d.mode==='move'?steps*SNAP*1.2:0,rh:d.mode==='resize'?(e-e0)/6e4*1.2:0}}
+function ldShow(){const d=ld,r=ldMin(),why=slotWhy(d.b,r.s,r.e);d.cur=r;r.why=why;d.el.style.transform=d.mode==='move'?`translateY(${r.dy}px)`:'';d.el.style.minHeight=d.mode==='resize'?Math.max(40,d.h+r.rh)+'px':'';
+ d.pv.className='ldp'+(why?' bad':'');d.pv.textContent=(d.mode==='move'?'Move · ':'Length · ')+tf(r.s)+' – '+tf(r.e)+' · '+Math.round((r.e-r.s)/6e4)+' min'+(why?' · '+why:'')}
+function ldOn(){const d=ld;d.on=true;document.body.classList.add('dragging');d.el.classList.add('ldg');d.h=d.el.getBoundingClientRect().height;d.pv=document.createElement('div');document.body.appendChild(d.pv);navigator.vibrate&&navigator.vibrate(12);ldShow();
+ d.iv=setInterval(()=>{if(!d.on)return;if(d.py>innerHeight-90)scrollBy(0,12);else if(d.py<110)scrollBy(0,-12);ldShow()},40)}
+function ldEnd(ok){const d=ld;if(!d)return;ld=null;clearTimeout(d.tm);clearInterval(d.iv);if(!d.on)return;document.body.classList.remove('dragging');noClick=Date.now()+450;d.el.classList.remove('ldg');d.el.style.transform='';d.el.style.minHeight='';d.pv&&d.pv.remove();const r=d.cur;if(!ok||!r)return;
+ if(+r.s===+new Date(d.b.startAt)&&+r.e===+new Date(d.b.endAt))return;if(r.why){toast('⚠ '+r.why+' Nothing was moved.');return}
+ applyMove(d.b,r.s,r.e,d.mode==='move'?'Moved to '+tf(r.s):'Duration set to '+fmt(Math.round((r.e-r.s)/6e4)))}
+document.addEventListener('pointerdown',e=>{if(view!=='focus'||FV()==='week'||FV()==='one'||dayGridOn()||e.button>0||e.target.closest('button'))return;const el=e.target.closest('.tl .blk');if(!el)return;const b=S.blocks.find(x=>x.id===el.dataset.id);if(!b||b.type==='shift'||b.fixed||b.status==='done'||b.status==='missed'||+new Date(b.endAt)<=Date.now())return;
+ const rs=!!e.target.closest('.blkrs'),hd=!!e.target.closest('.bt');if(e.pointerType==='touch'&&!rs&&!hd)return;ld={b,el,mode:rs?'resize':'move',x0:e.clientX,y0:e.clientY,py:e.clientY,sy:scrollY,on:false,type:e.pointerType,hd:e.pointerType==='touch'};try{e.target.setPointerCapture(e.pointerId)}catch(_){}},true);
+document.addEventListener('pointermove',e=>{const d=ld;if(!d)return;d.py=e.clientY;if(!d.on){const m=Math.hypot(e.clientX-d.x0,e.clientY-d.y0);if(m>(d.hd?3:5))ldOn();return}ldShow()},true);
+document.addEventListener('pointerup',()=>ldEnd(true),true);document.addEventListener('pointercancel',()=>ldEnd(false),true);
+function dayPlanView(){const ds=fdate,td=today(),st=dayStats(ds),dl=new Date(ds+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'}),tm=addDays(td,1),nm=ds===td?'Today':ds===tm?'Tomorrow':'';
+ return`<div class="dhd"><button data-act="fprev" aria-label="Previous day">‹</button><b>${dl}</b><button data-act="fnext" aria-label="Next day">›</button><button class="dtd" data-act="ftoday" aria-label="Jump to today">${nm||'Go to Today'}</button></div>${autoReviewHTML()}
+ <div class="dtools"><button class="chip" data-act="dgrid">List view</button></div><div class="dayw"><div class="dayg"><div class="dsh"><h2>${nm?nm+"'s ":''}Schedule<small>${fmt(st.planned)}</small></h2><button type="button" class="btn dab" data-act="newblock">+ Add block</button></div><div id="wkmsg" class="wkmsg" role="status" aria-live="polite">${wkMsg?wkMsg.html:''}</div>${dayGrid(ds)}</div></div>`}
+
 /* ---------- Views ---------- */
 const VIEWS={
 today(){return todayView()},
 focus(){return premiumFocus()},
-focusDay(){
+focusDay(){if(S.set.dayGrid)return dayPlanView();
  const all=dayBlocks(fdate),tot=all.filter(b=>b.type!=='shift').reduce((a,b)=>a+Math.round((new Date(b.endAt)-new Date(b.startAt))/6e4),0),dl=new Date(fdate+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
  return`<div class="top"><h1>Day</h1><button class="btn" data-act="newblock">+ Add block</button></div>
  <div class="dnav"><button data-act="fprev" aria-label="Previous day">${svg(IC.chev.match(/<path[^>]*>/)[0].replace('M9 5l7 7-7 7','M15 5l-7 7 7 7'),18)}</button><button class="dpill" data-act="ftoday" aria-label="Jump to today">${fdate===today()?'Today · ':''}${dl}</button><button data-act="fnext" aria-label="Next day">${IC.chev}</button></div>
- <small>${all.length} blocks · ${Math.floor(tot/60)}h ${tot%60}m planned · 15-minute grid${ovCount(all)?` · <span class="warn">⚠ ${ovCount(all)} overlapping</span>`:''}</small>
- ${all.length?`<div class="tl">${ovRender(all)}</div>`:`<div class="card">${emp(IC.timer,'No blocks yet','Add one to start your timeline.')}</div>`}`},
+ <div class="dtools"><button class="chip" data-act="dgrid">Timeline view</button></div><small>${all.length} blocks · ${Math.floor(tot/60)}h ${tot%60}m planned · 15-minute grid${ovCount(all)?` · <span class="warn">⚠ ${ovCount(all)} overlapping</span>`:''}</small>
+ ${all.length?`<div class="tl">${ovRender(all)}</div>`:`<div class="card">${emp(IC.timer,'No blocks yet','Add one to start your timeline.')}</div>`}<div id="wkmsg" class="wkmsg" role="status" aria-live="polite"></div>`},
 deadlines(){
  const L=open().filter(t=>t.dueDate),c={emg:0,urg:0,upc:0,safe:0};L.forEach(t=>c[sev(t)]++);
  const dn=live().filter(t=>t.status==='done'&&t.dueDate).length,col={emg:'var(--emg)',urg:'var(--urg)',upc:'var(--upc)',safe:'var(--safe)',done:'var(--done)'};
@@ -843,7 +1000,7 @@ function ovRender(all){return ovGroups(all).map(g=>{if(g.length<2)return bcard(g
 function bcard(b,all){const s=new Date(b.startAt),e=new Date(b.endAt),n=Date.now(),cur=+s<=n&&n<+e,
  ov=all.some(o=>o!==b&&+new Date(o.startAt)<+e&&+s<+new Date(o.endAt));
  return`<div class="blk${cur?' cur':''}${b.type==='break'?' brk':''}${ov?' ov':''}" data-act="editblock" data-id="${b.id}" tabindex="0" role="button"><div class="bt">${tf(s)}<small>${tf(e)}</small></div><div class="bc"><span class="bi" aria-hidden="true">${b.type==='break'?IC.cup:b.type==='shift'?pi(b.kind||'work',20):IC.book}</span><div class="bb"><b>${esc(btitle(b))}</b><small>${Math.round((e-s)/6e4)} min${ymd(e)!==ymd(s)?' · ends next day':''}${cur?' · <span class="nowt">NOW</span>':''}${ov?' · <span class="warn">⚠ Overlap</span>':''}${b.status==='done'?' · ✓ done'+(b.workedMin!==undefined?' ('+b.workedMin+' min)':''):''}${b.status==='missed'?' · <span class="warn">missed</span>':''}${b.fixed?' · Fixed':''}${b.auto?' · Smart':''}${b.locked?' · <span class="lk">🔒 Kept</span>':''}</small>${b.movedFrom&&!b.movedSeen?`<small class="mvd">↻ Moved automatically from ${tf(new Date(b.movedFrom.startAt))} <a href="#" data-act="ackmove" data-id="${b.id}">Got it</a></small>`:''}</div>${(()=>{const k=tById(b.taskId),el=k&&b.type!=='break'&&b.status!=='done'&&b.status!=='missed',lg=k&&k.plan&&k.plan.estMin&&b.type!=='break'&&b.status!=='done';
- return el||lg?`<div class="bact">${lg?`<button class="btn g" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''}${el?`<button class="play" data-act="playblock" data-id="${b.id}" aria-label="Start focus: ${esc(btitle(b))}">${ICO.play}</button>`:''}</div>`:''})()}</div></div>`}
+ return el||lg?`<div class="bact">${lg?`<button class="btn g" data-act="blockdone" data-id="${b.id}">✓ Log</button>`:''}${el?`<button class="play" data-act="playblock" data-id="${b.id}" aria-label="Start focus: ${esc(btitle(b))}">${ICO.play}</button>`:''}</div>`:''})()}</div>${b.type==='shift'||b.fixed||b.status==='done'||b.status==='missed'?'':'<span class="blkrs" aria-hidden="true"></span>'}</div>`}
 function dlist(){let L=live().filter(t=>t.dueDate);const q=dlq.toLowerCase();
  if(q)L=L.filter(t=>(t.title+' '+t.notes).toLowerCase().includes(q));
  L=L.filter(t=>dlf==='all'?t.status!=='done':sev(t)===dlf);
@@ -895,10 +1052,13 @@ function schUI(){const box=$('#sch');if(!box)return;const sm=smOf();box.dataset.
  const i=unt($('#m-i').value),u=unt($('#m-u').value),b=$('#m-pb');if(b){if(i===null||u===null)b.innerHTML='<span class="pch p4">Unsorted</span> Answer both questions to set P1–P4.';else{const k=prioTier({important:i,urgent:u},today());b.innerHTML=`<span class="pch p${k+1}">P${k+1}</span> ${PRIO_NAMES[k]} · ${PRN[k]}`}}}
 /* Live preview in the task form: how much time per day the planner will ask for, using the same planner that creates the sessions. */
 let pvT=0;
-function planPreview(){const el0=$('#pl-prev');if(!el0)return;const el={set innerHTML(h){if(el0._h!==h){el0._h=h;el0.innerHTML=h}}};const due=$('#m-d').value,g=i=>+($(i).value)||0,est=g('#pl-h')*60+g('#pl-m'),sm=smOf();
+const sm0=()=>typeof smOf==='function'?smOf():'';
+function planPreview(){const el0=$('#pl-prev');if(!el0)return;const el={set innerHTML(h){if(el0._h!==h){el0._h=h;el0.innerHTML=(sm0()==='regular'&&S.set.autoCal!==true?'<small class="mut pvn">Nothing is added to your calendar automatically. You choose when, from Focus → Day.</small>':'')+h}}};const due=$('#m-d').value,g=i=>+($(i).value)||0,est=g('#pl-h')*60+g('#pl-m'),sm=smOf();
  if(sm==='backlog'){el.innerHTML='<small class="mut">Saved to your backlog. Focusy adds nothing to your calendar, and you can still focus on it any time.</small>';return}
  const pl=readPlan(due);if(pl&&pl.err){el.innerHTML=`<small class="warn">${esc(pl.err)}</small>`;return}
+ if(sm==='regular'&&!pl.start){el.innerHTML='<small>No start time chosen, so <b>nothing is placed on your calendar</b>. The sessions this task needs will wait in the Priority Bucket on Focus → Day, and you decide when to do them. Pick a start time only if you want Focusy to place sessions for you.</small>';return}
  if(sm==='flex'){const L=pl.sessionMin||FLEX_SESS;el.innerHTML=`<small>Focusy may suggest a <b>${fmt(L)}</b> session on Today when real free time remains after fixed commitments, rest and higher-priority work. It never moves other sessions. If there is no room, the task simply stays in your backlog.</small>`;return}
+ if(!(est>0&&due)&&S.set.autoCal!==true){el.innerHTML='';return}
  if(!(est>0&&due)){const days=pl.days||[],sbt=$('#modal [data-act="savetask"]'),tid=sbt&&sbt.dataset.id,tt={id:tid||'__new',dueDate:due,important:unt($('#m-i').value),urgent:unt($('#m-u').value),plan:{...DEFP,...pl}},c=planHabit(tt,S.blocks,new Date(),planPrep(tt,S.blocks,new Date(),taskMap()));
   const ls=c.picks.slice(0,5).map(x=>`<li><div class="pvr"><span>${new Date(x.date+'T00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span><span class="pvt">${tf(x.startAt)} – ${tf(x.endAt)}</span><b>${fmt(Math.round((x.endAt-x.startAt)/6e4))}</b></div></li>`).join('');
   el.innerHTML=`<div class="pvh">${c.picks.length?`${c.picks.length} session${c.picks.length>1?'s':''} reserved over the next ${HABIT_DAYS} days`:'No free sessions fit right now'}</div><small class="mut">${esc(c.reasons[0])} ${c.picks.length?'':'Nothing is overlapped, and nothing important is moved.'}</small>${ls?`<ul class="pvl">${ls}${c.picks.length>5?`<li class="mut">+ ${c.picks.length-5} more</li>`:''}</ul>`:''}<small class="mut">Higher-priority work can take these slots. Completed history is never changed.</small>`;return}
@@ -930,7 +1090,7 @@ function blockModal(id){const b=id?S.blocks.find(x=>x.id===id):null,s=b?new Date
  <label for="b-t">Title (new task or break label)</label><input id="b-t" value="${b&&!b.taskId?esc(b.title):''}">
  <div class="grid2"><div><label for="b-d">Date</label><input type="date" id="b-d" value="${ymd(s)}"></div><div><label for="b-s">Start</label><select id="b-s">${opts(slots,sv)}</select></div></div>
  <label for="b-m">Duration (minutes, multiples of 15)</label><input type="number" id="b-m" min="15" step="15" value="${dur}"><div class="err" id="merr"></div>${b&&b.type!=='break'?`<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="b-k" ${b.locked?'checked':''}> Keep this time (Smart planning won't move it)</label>`:''}
- <div class="btns"><button class="btn" data-act="saveblock" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${b&&b.type!=='break'?`<button class="btn g" data-act="startblock" data-id="${id}">Start Focus</button>`:''}${b?`<button class="btn r" data-act="delblock" data-id="${id}">Delete</button>`:''}</div>`)}
+ <div class="btns"><button class="btn" data-act="saveblock" data-id="${id||''}">Save</button><button class="btn g" data-act="close">Cancel</button>${b&&b.type!=='break'?`<button class="btn g" data-act="startblock" data-id="${id}">Start Focus</button>`:''}${b&&b.taskId&&b.type!=='break'?`<button class="btn g" data-act="logblk" data-id="${b.taskId}">Log time</button>`:''}${b?`<button class="btn r" data-act="delblock" data-id="${id}">Delete</button>`:''}</div>`)}
 function prioModal(d){const p=S.prio[d]||{},cand=open().concat(p.taskId&&tById(p.taskId)&&!open().includes(tById(p.taskId))?[tById(p.taskId)]:[]);
  modal('One Thing · '+dlong(d),`<label for="p-t">Task</label><select id="p-t"><option value="">— new task (type below) —</option>${opts(cand.map(t=>[t.id,t.title]),p.taskId||'')}</select>
  <input id="p-n" placeholder="New task title" style="margin-top:8px"><label for="p-w">Purpose / why it matters</label><textarea id="p-w">${esc(p.purpose||'')}</textarea>
@@ -1231,7 +1391,7 @@ const ACT={
  copybk(){const t=$('#bk');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){}toast('Backup selected — copy it if not already copied')},
  restore(){try{const j=JSON.parse($('#rs').value);if(!j||!Array.isArray(j.tasks)||!Array.isArray(j.blocks))throw 0;
   try{localStorage.setItem(K+'_prev',JSON.stringify(S))}catch(e){}
-  S={tasks:j.tasks,blocks:j.blocks,prio:j.prio||{},set:{theme:'auto',weekStart:1,...j.set},sess:null};save();render();toast('Restored. Previous data kept aside.')}catch(e){$('#rerr').textContent='That does not look like a valid backup.'}},
+  S={tasks:j.tasks,blocks:j.blocks,prio:j.prio||{},set:{theme:'auto',weekStart:1,...j.set},sess:null,...(j.dplan?{dplan:j.dplan}:{})};save();render();toast('Restored. Previous data kept aside.')}catch(e){$('#rerr').textContent='That does not look like a valid backup.'}},
  wipe(d,el){if(!el.dataset.armed){el.dataset.armed=1;el.textContent='Tap again to delete everything';return}
   try{localStorage.setItem(K+'_prev',JSON.stringify(S))}catch(e){}S={tasks:[],blocks:[],prio:{},set:{theme:'auto',weekStart:1},sess:null};save();render()}
 };
@@ -1318,29 +1478,51 @@ function fvHead(){const f=FV(),n=streakN(),T=[['one','One Thing','target'],['day
  return`<div class="pmh"><div class="pbrand"><span class="lg" data-lg>${MARK(30)}</span><span><b>Focusy</b><small>Plan • Focus • Execute</small></span></div>${n?`<span class="strk" title="Days in a row with focus time">${pi('flame',16)} ${n} day streak</span>`:''}</div>
  <div class="seg" role="tablist" aria-label="Focus view">${T.map(([k,l,i])=>`<button role="tab" aria-selected="${f===k}" class="${f===k?'on':''}" data-act="fv" data-v="${k}">${pi(i,17)}<span>${l}</span></button>`).join('')}</div>${sessChip()}`}
 /* ---------- Week planner ---------- */
-const PPM=.8,SNAP=15;let wkSc=null,wkFree=false,wkUndo=[],wkMsg=null,dragSt=null,noClick=0;
+let PPM=.8;const SNAP=15;let wkSc=null,wkFree=false,wkUndo=[],wkMsg=null,dragSt=null,noClick=0;
 const weekStartOf=ds=>{const w=S.set.weekStart??1,k=(new Date(ds+'T00:00').getDay()-w+7)%7;return addDays(ds,-k)};
 const wkTitle=ws=>{const a=new Date(ws+'T00:00'),b=new Date(addDays(ws,6)+'T00:00'),f=d=>d.toLocaleDateString([],{month:'short',day:'numeric'});return f(a)+' – '+f(b)+', '+b.getFullYear()};
 function segOf(b,i,ds0){const a=ds0[i],z=ds0[i+1],s=+new Date(b.startAt),e=+new Date(b.endAt);return{s:Math.max(s,a),e:Math.min(e,z),a}}
-function weekView(){const ws=weekStartOf(fdate),days=[...Array(7)].map((_,i)=>addDays(ws,i)),td=today(),ds0=[...days,addDays(ws,7)].map(d=>+new Date(d+'T00:00')),by=days.map(()=>[]),now=Date.now();
+function weekViewOld(){const ws=weekStartOf(fdate),days=[...Array(7)].map((_,i)=>addDays(ws,i)),td=today(),ds0=[...days,addDays(ws,7)].map(d=>+new Date(d+'T00:00')),by=days.map(()=>[]),now=Date.now();
  for(const b of S.blocks){const s=+new Date(b.startAt),e=+new Date(b.endAt);if(e<=ds0[0]||s>=ds0[7])continue;for(let i=0;i<7;i++)if(s<ds0[i+1]&&e>ds0[i])by[i].push(b)}
- const col=(ds,i)=>{const L=by[i].map(b=>({b,...segOf(b,i,ds0)})).sort((p,q)=>p.s-q.s||q.e-p.e),lanes=[];let cl=[],end=0;
+ const fc=fcWeek(days),col=(ds,i)=>{const L=by[i].map(b=>({b,...segOf(b,i,ds0)})).sort((p,q)=>p.s-q.s||q.e-p.e),lanes=[];let cl=[],end=0;
   const flush=()=>{const n=Math.max(1,...cl.map(x=>x.l+1));cl.forEach(x=>x.n=n);cl=[]};
   for(const x of L){if(cl.length&&x.s>=end)flush();let l=0;while(cl.some(y=>y.l===l&&y.e>x.s))l++;x.l=l;cl.push(x);end=Math.max(end,x.e)}if(cl.length)flush();
   const free=wkFree?freeGaps(L,ds0[i],ds0[i+1],ds===td?now:0):'';
-  return`<div class="dc${ds===td?' tdy':''}" data-d="${ds}">${free}${L.map(x=>wblock(x,ds)).join('')}${ds===td?`<i class="nowl" style="top:${(now-ds0[i])/6e4*PPM}px"></i>`:''}</div>`};
+  return`<div class="dc${ds===td?' tdy':''}" data-d="${ds}">${free}${(fc[ds]||[]).filter(x=>+new Date(x.p.endAt)>now&&!by[i].some(o=>+new Date(o.startAt)<+new Date(x.p.endAt)&&+new Date(x.p.startAt)<+new Date(o.endAt))).map(x=>{const a=new Date(x.p.startAt),z=new Date(x.p.endAt),tp=(a-ds0[i])/6e4*PPM,h=Math.max(20,(z-a)/6e4*PPM-2);return`<div class="wb fc" data-act="fcadd" data-t="${x.t.id}" data-s="${a.toISOString()}" data-e="${z.toISOString()}" style="top:${tp}px;height:${h}px;left:0;width:calc(100% - 3px)" tabindex="0" role="button" aria-label="Forecast: ${esc(x.t.title)} ${tf(a)}. Tap to add to Day"><div class="wi"><b>${esc(x.t.title)}</b></div>${h>34?`<small>Forecast ${tf(a)}</small>`:''}</div>`}).join('')}${L.map(x=>wblock(x,ds)).join('')}${ds===td?`<i class="nowl" style="top:${(now-ds0[i])/6e4*PPM}px"></i>`:''}</div>`};
  const hours=[...Array(24)].map((_,h)=>`<div class="hl" style="top:${h*60*PPM}px">${h===0?'':new Date(2000,0,1,h).toLocaleTimeString([],{hour:'numeric'})}</div>`).join('');
- const head=days.map(d=>{const dt=new Date(d+'T00:00');return`<div class="dh${d===td?' tdy':''}" data-act="wkday" data-d="${d}"><b>${dt.toLocaleDateString([],{weekday:'short'})}</b><small>${dt.toLocaleDateString([],{month:'short',day:'numeric'})}</small></div>`}).join('');
+ const head=days.map(d=>{const dt=new Date(d+'T00:00');return`<div class="dh${d===td?' tdy':''}" data-act="wkday" data-d="${d}"><b>${dt.toLocaleDateString([],{weekday:'short'})}</b><small>${dt.toLocaleDateString([],{month:'short',day:'numeric'})}</small>${(()=>{const i=days.indexOf(d),m=by[i].filter(b=>b.type!=='shift'&&b.type!=='break').reduce((a,b)=>a+dmin(b),0)+(fc[d]||[]).reduce((a,x)=>a+Math.round((new Date(x.p.endAt)-new Date(x.p.startAt))/6e4),0);return m?`<small class="fct">${fmt(m)}</small>`:''})()}</div>`}).join('');
  return`<div class="wknav"><button class="ib" data-act="wkprev" aria-label="Previous week">${pi('back',18)}</button><button class="wkt" data-act="wktoday" aria-label="Jump to this week">${wkTitle(ws)}</button><button class="ib" data-act="wknext" aria-label="Next week">${pi('fwd',18)}</button></div>
  <div class="wktool"><button class="chip addsh" data-act="addshift">${pi('plus',14)} Add shift</button><button class="chip${wkFree?' on':''}" data-act="wkfree">Show free time</button><button class="chip" data-act="wkundo" ${wkUndo.length?'':'disabled'}>${pi('undo',14)} Undo</button><button class="chip" data-act="wkday" data-d="${td}">${pi('timer',14)} Day view</button><button class="chip" data-act="newblock">${pi('plus',14)} Block</button></div><div class="swipe" id="swipe" aria-hidden="true">‹ Swipe sideways for more days ›</div>
  <div id="wkmsg" class="wkmsg" role="status" aria-live="polite">${wkMsg?wkMsg.html:''}</div>
  <div class="wk" id="wk"><div class="wkh"><div class="tc"></div>${head}</div><div class="wkb"><div class="tc">${hours}</div>${days.map(col).join('')}</div></div>
- <div class="legend"><b>Flexible focus time</b><small>Touch &amp; hold a block, then drag to reschedule</small><div class="lg4"><span><i class="sw fxs"></i>Work shift (fixed)</span><span><i class="sw flx"></i>Focus (flexible)</span><span><i class="sw lkd"></i>Locked</span></div><div class="lg4 pr"><span><i class="pd p1"></i>P1</span><span><i class="pd p2"></i>P2</span><span><i class="pd p3"></i>P3</span><span><i class="pd p4"></i>P4</span></div></div>
+ <div class="legend"><b>Flexible focus time</b><small>Touch &amp; hold a block, then drag to reschedule · dashed blocks are a forecast, tap one to add it to Day</small><div class="lg4"><span><i class="sw fxs"></i>Work shift (fixed)</span><span><i class="sw flx"></i>Focus (flexible)</span><span><i class="sw lkd"></i>Locked</span></div><div class="lg4 pr"><span><i class="pd p1"></i>P1</span><span><i class="pd p2"></i>P2</span><span><i class="pd p3"></i>P3</span><span><i class="pd p4"></i>P4</span></div></div>
  ${dlOverview()}`}
-function wblock(x,ds){const b=x.b,fx=!!b.fixed||b.type==='shift',t=b.taskId&&tById(b.taskId),done=b.status==='done',miss=b.status==='missed',past=+new Date(b.endAt)<=Date.now(),lk=!!b.locked,k=t?ptier(t):3,
+const rng=b=>{const a=new Date(b.startAt),z=new Date(b.endAt),f=d=>d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}),A=f(a),Z=f(z);return A.slice(-2)===Z.slice(-2)?A.slice(0,-3)+'–'+Z:A+'–'+Z};
+function wblock(x,ds,day){const b=x.b,fx=!!b.fixed||b.type==='shift',t=b.taskId&&tById(b.taskId),done=b.status==='done',miss=b.status==='missed',past=+new Date(b.endAt)<=Date.now(),lk=!!b.locked,k=t?ptier(t):3,
   top=(x.s-x.a)/6e4*PPM,h=Math.max(20,(x.e-x.s)/6e4*PPM-2),cont=+new Date(b.startAt)<x.a,mv=+new Date(b.endAt)>x.a+864e5-1,tt=fx?(b.title||SHK[b.kind]):btitle(b),
-  tm=cont?'until '+tf(new Date(b.endAt)):tf(new Date(b.startAt))+(mv?' →':'–'+tf(new Date(b.endAt))),can=!fx&&!done&&!miss&&!past&&b.type!=='break'&&b.taskId;
-  const w=100/(x.n||1);return`<div class="wb ${fx?'fx k-'+(b.kind||'work'):'fl'}${lk?' lk':''}${done?' dn':''}${miss?' ms':''}${can?' dg':''}" data-act="${fx?'editshift':'editblock'}" data-id="${b.id}" data-d="${ds}" style="top:${top}px;height:${h}px;left:${x.l*w}%;width:calc(${w}% - 3px);--pc:var(--p${k+1})" tabindex="0" role="button" aria-label="${esc(tt)} ${tm}"><div class="wi">${pi(fx?(b.kind||'work'):'task',14)}<b>${esc(tt)}</b>${lk||fx?`<em>${pi('lock',11)}</em>`:''}${can?`<span class="gr">${pi('grip',12)}</span>`:''}</div>${h>34?`<small>${t&&!fx?`<span class="pt">P${k+1}</span> `:''}${tm}${fx?' · Fixed':''}</small>`:''}${can?'<span class="rs" aria-hidden="true"></span>':''}</div>`}
+  tm=cont?'until '+tf(new Date(b.endAt)):tf(new Date(b.startAt))+(mv?' →':'–'+tf(new Date(b.endAt))),can=!fx&&!done&&!miss&&!past&&b.type!=='break'&&b.taskId,dur=Math.round((x.e-x.s)/6e4);
+  const w=100/(x.n||1),cls=`wb ${fx?'fx k-'+(b.kind||'work'):'fl'}${lk&&!day?' lk':''}${done?' dn':''}${miss?' ms':''}${can?' dg':''}`,at=`data-act="${fx?'editshift':'editblock'}" data-id="${b.id}" data-d="${ds}" style="top:${top}px;height:${h}px;left:${x.l*w}%;width:calc(${w}% - 3px);--pc:var(--p${k+1})" tabindex="0" role="button" aria-label="${esc(tt)} ${tm}"`;
+  if(day){const el=t&&b.type!=='break'&&!done&&!miss,lg=t&&t.plan&&t.plan.estMin&&b.type!=='break'&&!done,big=h>=62,mid=h>=40,
+   acts=big&&(el||lg)&&!past?`<div class="wba">${lg?`<button type="button" class="wlg" data-act="blockdone" data-id="${b.id}" aria-label="Log time for ${esc(tt)}">✓ Log</button>`:''}${el?`<button type="button" class="play wpl" data-act="playblock" data-id="${b.id}" aria-label="Start focus: ${esc(tt)}">${ICO.play}</button>`:''}</div>`:'';
+   return`<div class="${cls}${big?' big':mid?' mid':' sm'}" ${at}>${can?`<span class="gr" aria-hidden="true">${pi('grip',14)}</span>`:''}<span class="wtl" aria-hidden="true">${pi(fx?(b.kind||'work'):b.type==='break'?'cup':'task',16)}</span><div class="wbb"><b>${esc(tt)}</b>${mid||!can?`<small>${rng(b)}${fx?' · Fixed':' · '+dur+'m'}${done?' · ✓':''}</small>`:`<small>${dur} min</small>`}</div>${acts}${can?'<span class="rs" aria-hidden="true"></span>':''}</div>`}
+  return`<div class="${cls}" ${at}><div class="wi">${pi(fx?(b.kind||'work'):'task',14)}<b>${esc(tt)}</b>${lk||fx?`<em>${pi('lock',11)}</em>`:''}${can?`<span class="gr">${pi('grip',12)}</span>`:''}</div>${h>34?`<small>${t&&!fx?`<span class="pt">P${k+1}</span> `:''}${tm}${fx?' · Fixed':''}</small>`:''}${can?'<span class="rs" aria-hidden="true"></span>':''}</div>`}
+let wcd=null;
+function weekView(){return weekViewOld();
+ const ws=weekStartOf(fdate),td=today(),days=[...Array(7)].map((_,i)=>addDays(ws,i));
+ const card=d=>{const dt=new Date(d+'T00:00'),bl=dayBlocks(d).filter(b=>b.type!=='break'&&b.status!=='missed'&&ymd(new Date(b.startAt))===d),tk=bl.filter(b=>b.type!=='shift'&&!b.fixed&&b.taskId),un=planItems(d).filter(i=>!itemBlocks(d,i.t).length),
+   mins=tk.reduce((a,b)=>a+dmin(b),0)+un.reduce((a,i)=>a+i.min,0),
+   chip=b=>{const fx=!!b.fixed||b.type==='shift',can=!fx&&b.status!=='done'&&+new Date(b.endAt)>Date.now(),t=b.taskId&&tById(b.taskId),ti=fx?(b.title||SHK[b.kind]||'Fixed'):btitle(b);return`<div class="wch${fx?' fx':''}${b.status==='done'?' dn':''}" data-b="${b.id}">${can?`<button type="button" class="wcg" data-act="wkmv" data-id="${b.id}" aria-label="Move ${esc(ti)} to another day">${pi('grip',14)}</button>`:'<span class="wcg off"></span>'}<span class="wct">${tf(new Date(b.startAt))}</span><b>${esc(ti)}</b><span class="wcd">${fx?'':dmin(b)+'m'}</span></div>`},
+   uchip=i=>{const t=tById(i.t);return`<div class="wch un"><span class="wcg off"></span><span class="wct">No time</span><b>${esc(t.title)}</b><span class="wcd">${i.min}m</span></div>`};
+  return`<section class="wdc${d===td?' tdy':''}${bl.length||un.length?'':' em'}" data-d="${d}" data-act="wkday"><button type="button" class="wdh" data-act="wkday" data-d="${d}" aria-label="Open ${dt.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})}"><b>${dt.toLocaleDateString([],{weekday:'short'})}</b><span>${dt.toLocaleDateString([],{month:'short',day:'numeric'})}</span><em>${mins?fmt(mins):''}</em></button>${bl.length||un.length?bl.map(chip).join('')+un.map(uchip).join(''):'<small class="wem">Nothing planned</small>'}</section>`};
+ return`<div class="wknav"><button class="ib" data-act="wkprev" aria-label="Previous week">${pi('back',18)}</button><button class="wkt" data-act="wktoday" aria-label="Jump to this week">${wkTitle(ws)}</button><button class="ib" data-act="wknext" aria-label="Next week">${pi('fwd',18)}</button></div>${autoReviewHTML()}
+ <div class="wcards" id="wcards">${days.map(card).join('')}</div>`}
+/* drag a calendar chip onto another day card (grip only; a plain tap on the grip opens the day picker instead) */
+document.addEventListener('pointerdown',e=>{if(true||view!=='focus'||FV()!=='week'||e.button>0)return;const g=e.target.closest&&e.target.closest('.wcg:not(.off)');if(!g)return;const ch=g.closest('.wch'),b=S.blocks.find(x=>x.id===ch.dataset.b);if(!b)return;wcd={b,ch,x0:e.clientX,y0:e.clientY,on:false,tgt:null};try{g.setPointerCapture(e.pointerId)}catch(_){}},true);
+document.addEventListener('pointermove',e=>{const w=wcd;if(!w)return;if(!w.on){if(Math.hypot(e.clientX-w.x0,e.clientY-w.y0)<=4)return;w.on=true;document.body.classList.add('dragging');w.ch.classList.add('lifted');w.g=w.ch.cloneNode(true);w.g.classList.add('wgh');document.body.appendChild(w.g);navigator.vibrate&&navigator.vibrate(12)}
+ w.g.style.left=(e.clientX-40)+'px';w.g.style.top=(e.clientY-18)+'px';const c=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList&&x.classList.contains('wdc'));w.tgt=c?c.dataset.d:null;document.querySelectorAll('.wdc.okc').forEach(x=>x.classList.remove('okc'));if(c&&c.dataset.d!==w.b.date)c.classList.add('okc')},true);
+const wcEnd=ok=>{const w=wcd;if(!w)return;wcd=null;if(!w.on)return;document.body.classList.remove('dragging');w.g&&w.g.remove();w.ch.classList.remove('lifted');document.querySelectorAll('.wdc.okc').forEach(x=>x.classList.remove('okc'));noClick=Date.now()+450;if(ok&&w.tgt&&w.tgt!==w.b.date)moveToDay(w.b,w.tgt)};
+document.addEventListener('pointerup',()=>wcEnd(true),true);document.addEventListener('pointercancel',()=>wcEnd(false),true);
+
 function freeGaps(L,a,z,now){const lo=Math.max(a+6*36e5,now||0),hi=a+23*36e5;if(hi<=lo)return'';const iv=L.filter(x=>x.e>lo&&x.s<hi).sort((p,q)=>p.s-q.s);let cur=lo,out='';for(const x of iv){if(x.s-cur>=30*6e4)out+=gap(cur,x.s,a);cur=Math.max(cur,x.e)}if(hi-cur>=30*6e4)out+=gap(cur,hi,a);return out}
 const gap=(s,e,a)=>`<i class="fz" style="top:${(s-a)/6e4*PPM}px;height:${(e-s)/6e4*PPM}px"></i>`;
 function wkRestore(){const w=$('#wk');if(!w)return;if(wkSc)w.scrollTop=wkSc.y;else{let mn=1e9;w.querySelectorAll('.wb').forEach(e=>{mn=Math.min(mn,e.offsetTop)});w.scrollTop=mn<1e9?Math.max(5*60*PPM,mn-50):7*60*PPM}if(wkSc)w.scrollLeft=wkSc.x;else{const t=w.querySelector('.dh.tdy');if(t)w.scrollLeft=Math.max(0,t.offsetLeft-60)}
@@ -1354,34 +1536,96 @@ function applyMove(b,start,end,label){const pv={s:b.startAt,e:b.endAt,d:b.date,l
  b.startAt=start.toISOString();b.endAt=end.toISOString();b.date=ymd(start);b.plannedMin=Math.round((end-start)/6e4);b.locked=true;delete b.movedFrom;b.updatedAt=nowIso();
  const undo=()=>{b.startAt=pv.s;b.endAt=pv.e;b.date=pv.d;b.plannedMin=pv.pm;if(pv.lk)b.locked=pv.lk;else delete b.locked;if(pv.mf)b.movedFrom=pv.mf;save();render()};wkUndo.push(undo);if(wkUndo.length>10)wkUndo.shift();save();render();toast(label,()=>{wkUndo.pop();undo()})}
 function dragBegin(el,e,mode){const b=S.blocks.find(x=>x.id===el.dataset.id);if(!b)return;const ix=occIndex(S.blocks.filter(x=>x!==b)),t=tById(b.taskId);
- dragSt={b,el,mode,ix,t,dur:dmin(b),x0:e.clientX,y0:e.clientY,on:false,pid:e.pointerId,type:e.pointerType,off:0,cur:null,sc:0}}
+ dragSt={b,el,mode,ix,t,dur:dmin(b),x0:e.clientX,y0:e.clientY,on:false,pid:e.pointerId,type:e.pointerType,off:0,cur:null,sc:0,hd:false}}
 function dragOn(){const d=dragSt;d.on=true;document.body.classList.add('dragging');d.el.classList.add('lifted');d.gh=document.createElement('div');d.gh.className='wb ghost';d.gh.innerHTML=`<b>${esc(btitle(d.b))}</b><small></small>`;const w=$('#wk');d.w=w;navigator.vibrate&&navigator.vibrate(12);
  const r=d.el.getBoundingClientRect();d.off=d.mode==='move'?Math.max(0,Math.min(r.height,d.y0-r.top)):0}
-function dragMove(e){const d=dragSt;if(!d)return;if(!d.on){if(d.type!=='touch'&&Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>5)dragOn();else return}
+function dragMove(e){const d=dragSt;if(!d)return;if(!d.on){if((d.type!=='touch'||d.hd)&&Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>(d.hd?3:5))dragOn();else return}
  d.px=e.clientX;d.py=e.clientY;dragPlace()}
-function dragPlace(){const d=dragSt;if(!d||!d.on)return;const cols=[...d.w.querySelectorAll('.dc')];let c=null;for(const x of cols){const r=x.getBoundingClientRect();if(d.px>=r.left&&d.px<r.right){c=x;break}}if(!c){c=d.cur&&d.cur.c||cols[0]}
+function dragPlace(){const d=dragSt;if(!d||!d.on)return;const cols=[...d.w.querySelectorAll('.dc')];let c=null;
+ if(d.mode==='new'){const q=d.w.getBoundingClientRect();if(d.py<q.top||d.py>q.bottom||d.px<q.left||d.px>q.right){d.cur=null;if(d.gh)d.gh.remove();cols.forEach(x=>x.classList.remove('okc'));d.sc=d.py<q.top+50&&d.py>=q.top-40?-12:d.py>q.bottom-50&&d.py<=q.bottom+40?12:0;return}}
+for(const x of cols){const r=x.getBoundingClientRect();if(d.px>=r.left&&d.px<r.right){c=x;break}}if(!c){c=d.cur&&d.cur.c||cols[0]}
  const r=c.getBoundingClientRect();let m,ds=c.dataset.d,dur=d.dur;
- if(d.mode==='move'){m=Math.round(((d.py-r.top-d.off)/PPM)/SNAP)*SNAP;m=Math.max(0,Math.min(1440-dur,m))}
+ if(d.mode!=='resize'){m=Math.round(((d.py-r.top-d.off)/PPM)/SNAP)*SNAP;m=Math.max(0,Math.min(1440-dur,m))}
  else{const s=new Date(d.b.startAt),sm=s.getHours()*60+s.getMinutes();ds=d.b.date;m=sm;const em=Math.round(((d.py-r.top)/PPM)/SNAP)*SNAP;dur=Math.max(SNAP,Math.min(1440-sm,em-sm));c=cols.find(x=>x.dataset.d===ds)||c}
  const s=new Date(ds+'T00:00');s.setHours(0,m,0,0);const e=new Date(+s+dur*6e4),hit=conflicts(d.ix,ds,+s,+e);let why='';
- if(+s<Date.now()&&d.mode==='move')why='That time has already passed.';else if(d.t&&d.t.dueDate&&ds>d.t.dueDate)why='That is after the deadline ('+fd(d.t.dueDate)+').';else if(hit.length){const h=hit[0];why='Conflicts with '+(h.fixed?'':'')+esc(h.type==='shift'||h.fixed?(h.title||SHK[h.kind]):btitle(h))+' ('+tf(new Date(h.startAt))+'–'+tf(new Date(h.endAt))+').'}
+ if(+s<Date.now()&&d.mode!=='resize')why='That time has already passed.';else if((d.mode==='new'||dayGridOn())&&(m<PROT_A||m+dur>PROT_B))why='That is in your protected sleep hours (11 PM – 6 AM).';else if(d.t&&d.t.dueDate&&ds>d.t.dueDate)why='That is after the deadline ('+fd(d.t.dueDate)+').';else if(hit.length){const h=hit[0];why='Conflicts with '+(h.fixed?'':'')+esc(h.type==='shift'||h.fixed?(h.title||SHK[h.kind]):btitle(h))+' ('+tf(new Date(h.startAt))+'–'+tf(new Date(h.endAt))+').'}
  d.cur={c,ds,m,dur,s,e,why,hit};if(d.gh.parentNode!==c)c.appendChild(d.gh);d.gh.style.cssText=`top:${m*PPM}px;height:${Math.max(20,dur*PPM-2)}px;left:0;width:calc(100% - 3px)`;d.gh.classList.toggle('bad',!!why);d.gh.querySelector('small').textContent=tf(s)+'–'+tf(e);
  cols.forEach(x=>x.classList.toggle('okc',x===c&&!why));
  const wr=d.w.getBoundingClientRect();d.sc=d.py<wr.top+50?-12:d.py>wr.bottom-50?12:0;d.scx=d.px<wr.left+52?-12:d.px>wr.right-40?12:0}
 function dragEnd(ok){const d=dragSt;if(!d)return;dragSt=null;clearTimeout(d.tm);clearInterval(d.iv);document.body.classList.remove('dragging');if(!d.on)return;noClick=Date.now()+450;d.el.classList.remove('lifted');d.gh&&d.gh.remove();d.w.querySelectorAll('.dc.okc').forEach(x=>x.classList.remove('okc'));
- const c=d.cur;if(!ok||!c)return;const same=+c.s===+new Date(d.b.startAt)&&+c.e===+new Date(d.b.endAt);if(same)return;
+ const c=d.cur;if(d.mode==='new'){if(!ok||!c)return;if(c.why){const f=daySlots(d.t,c.ds,c.dur,1)[0];wkShow(`<span class="warn">⚠ ${c.why}</span> Nothing was placed.${f?` <button class="chip" data-act="plslot2" data-id="${d.t.id}" data-s="${f}" data-u="${c.dur}">Use ${tf(new Date(f))}</button>`:''}`);return}dayPlace(d.t.id,c.s,c.e);return}if(!ok||!c)return;const same=+c.s===+new Date(d.b.startAt)&&+c.e===+new Date(d.b.endAt);if(same)return;
  if(c.why){const f=nearestFree(d.ix,c.ds,c.dur,c.m);wkShow(`<span class="warn">⚠ ${c.why}</span> Nothing was moved.${f?` <button class="chip" data-act="wkuse" data-id="${d.b.id}" data-d="${f.d}" data-m="${f.m}" data-u="${c.dur}">Use ${f.d===c.ds?'':fd(f.d)+' '}${tf(new Date(new Date(f.d+'T00:00').setHours(0,f.m,0,0)))}</button>`:''}`);return}
  applyMove(d.b,c.s,c.e,d.mode==='move'?'Moved to '+(c.ds===d.b.date?'':fd(c.ds)+' ')+tf(c.s)+' · kept at this time':'Duration set to '+fmt(c.dur))}
-document.addEventListener('pointerdown',e=>{if(view!=='focus'||FV()!=='week'||e.button>0)return;const rs=e.target.closest('.rs'),el=e.target.closest('.wb.dg');if(!el)return;dragBegin(el,e,rs?'resize':'move');const d=dragSt;
- if(e.pointerType==='touch'){d.tm=setTimeout(()=>{if(dragSt===d){dragOn();dragMove({clientX:d.x0,clientY:d.y0})}},rs?120:320)}
+document.addEventListener('pointerdown',e=>{if(view!=='focus'||!(FV()==='week'||dayGridOn())||e.button>0)return;const rs=e.target.closest('.rs'),el=e.target.closest('.wb.dg');if(!el)return;dragBegin(el,e,rs?'resize':'move');const d=dragSt,hd=!!e.target.closest('.gr,.rs');d.hd=hd&&e.pointerType==='touch';if(hd){try{e.target.setPointerCapture(e.pointerId)}catch(_){}}
+ if(e.pointerType==='touch'&&!d.hd){d.tm=setTimeout(()=>{if(dragSt===d){dragOn();dragMove({clientX:d.x0,clientY:d.y0})}},rs?120:320)}
  d.iv=setInterval(()=>{if(!d.on)return;const w=d.w;if(d.sc)w.scrollTop+=d.sc;if(d.scx)w.scrollLeft+=d.scx;dragPlace()},30)},true);
-document.addEventListener('pointermove',e=>{const d=dragSt;if(!d)return;if(!d.on&&d.type==='touch'&&Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>10){clearTimeout(d.tm);clearInterval(d.iv);dragSt=null;return}dragMove(e)},true);
+document.addEventListener('pointermove',e=>{const d=dragSt;if(!d)return;if(!d.on&&d.type==='touch'&&!d.hd&&Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>10){clearTimeout(d.tm);clearInterval(d.iv);dragSt=null;return}dragMove(e)},true);
 document.addEventListener('pointerup',e=>dragEnd(true),true);document.addEventListener('pointercancel',()=>dragEnd(false),true);
-document.addEventListener('touchmove',e=>{if(dragSt&&dragSt.on)e.preventDefault()},{passive:false});
+document.addEventListener('touchmove',e=>{if((dragSt&&dragSt.on)||(wcd&&wcd.on)||(ld&&ld.on))e.preventDefault()},{passive:false});
 document.addEventListener('click',e=>{if(Date.now()<noClick){e.stopPropagation();e.preventDefault()}},true);
 document.addEventListener('contextmenu',e=>{if(dragSt)e.preventDefault()});
+/* ---- Day planner actions ---- */
+const dayGridOn=()=>FV()!=='one'&&FV()!=='week'&&!!S.set.dayGrid;
+let plS={id:null,min:30};
+const itemOf=(ds,tid)=>planItems(ds).find(i=>i.t===tid);
+function placeSheet(){const t=tById(plS.id);if(!t)return;const ds=fdate,sl=daySlots(t,ds,plS.min,4),dl=new Date(ds+'T00:00').toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'});
+ sheet('Schedule on '+dl,`<div class="plsh"><div><b>${esc(t.title)}</b> <small class="mut">${dmn(plS.min)}</small></div><div class="chips">${sl.map(s=>`<button type="button" class="chip pvs" data-act="plslot" data-s="${s}">${tf(new Date(s))}</button>`).join('')||'<span class="mut">No free slot on this day.</span>'}</div>
+ <div class="plc"><input type="time" id="pl-ct" step="900" value="${sl.length?pad(new Date(sl[0]).getHours())+':'+pad(new Date(sl[0]).getMinutes()):'09:00'}" aria-label="Start time"><button type="button" class="btn" data-act="plcustom">Add</button></div><small class="warn" id="pl-err" role="alert"></small></div>`)}
+function itemSheet(tid){const ds=fdate,t=tById(tid),L=planItems(ds),i=L.find(x=>x.t===tid);if(!t||!i)return;const bl=itemBlocks(ds,tid),pos=L.indexOf(i),sl=bl.length?[]:daySlots(t,ds,i.min,3),b0=bl[0],v=b0?pad(new Date(b0.startAt).getHours())+':'+pad(new Date(b0.startAt).getMinutes()):(sl.length?pad(new Date(sl[0]).getHours())+':'+pad(new Date(sl[0]).getMinutes()):'09:00');
+ sheet(esc(t.title),`<div class="plsh"><small class="mut">Planned time on this day (separate from the task's total estimate)</small>
+ <div class="chips">${[15,30,45,60,90,120].map(m=>`<button type="button" class="chip${m===i.min?' on':''}" data-act="ipmin" data-m="${m}" data-id="${tid}">${dmn(m)}</button>`).join('')}</div>
+ <div class="plc"><input type="number" id="ip-min" min="5" max="480" step="5" inputmode="numeric" value="${i.min}" aria-label="Minutes planned"><button type="button" class="btn g" data-act="ipminset" data-id="${tid}">Set minutes</button></div>
+ <small class="mut">${b0?'Start time':'Start time (optional)'}</small>
+ ${sl.length?`<div class="chips">${sl.map(x=>`<button type="button" class="chip pvs" data-act="ipslot" data-id="${tid}" data-s="${x}">${tf(new Date(x))}</button>`).join('')}</div>`:''}
+ <div class="plc"><input type="time" id="ip-t" step="900" value="${v}" aria-label="Start time"><button type="button" class="btn" data-act="ipplace" data-id="${tid}">${b0?'Move':'Place'}</button></div><small class="warn" id="pl-err" role="alert"></small>
+ <div class="plc"><button type="button" class="btn g" data-act="ipup" data-id="${tid}"${pos===0?' disabled':''}>▲ Rank higher</button><button type="button" class="btn g" data-act="ipdn" data-id="${tid}"${pos===L.length-1?' disabled':''}>▼ Lower</button></div>
+ <button type="button" class="btn r" data-act="iprem" data-id="${tid}">Remove from this day</button></div>`)}
+function addSheet(){const ds=fdate,inL=new Set(planItems(ds).map(i=>i.t)),B=dayBucket(ds),rec=[...B.req,...B.flex].filter(x=>!inL.has(x.t.id)),rid=new Set(rec.map(x=>x.t.id)),oth=open().filter(t=>!inL.has(t.id)&&!rid.has(t.id)).sort((a,b)=>pkScore(b,null)-pkScore(a,null)),
+ r=(t,m)=>`<button type="button" class="adr" data-act="pbkpick" data-id="${t.id}" data-m="${m}"><b>${esc(t.title)}</b><small>${t.dueDate?'Due '+fd(t.dueDate)+' · ':''}${dmn(m)}</small></button>`;
+ sheet('Add tasks to this day',`<div class="plsh"><input type="search" id="ad-q" placeholder="Search tasks" aria-label="Search tasks">${rec.length?`<small class="mut">Recommended</small>${rec.map(x=>r(x.t,x.min)).join('')}`:''}${oth.length?`<small class="mut">All other tasks</small>${oth.slice(0,60).map(t=>r(t,t.plan&&t.plan.sessionMin||30)).join('')}`:''}${!rec.length&&!oth.length?'<p class="mut">No open tasks.</p>':''}</div>`)}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='ad-q'){const q=e.target.value.toLowerCase();document.querySelectorAll('.adr').forEach(b=>{b.style.display=b.textContent.toLowerCase().includes(q)?'':'none'})}});
+const ipErr=m=>{const r=$('#pl-err');if(r)r.textContent=m};
+const ipRe=tid=>{save();render();itemSheet(tid)};
+function ipSetMin(tid,m){m=Math.max(5,Math.min(480,Math.round(m/5)*5||30));const ds=fdate;dpMut(ds,L=>{const i=L.find(x=>x.t===tid);if(i)i.min=m});const bl=itemBlocks(ds,tid);let msg='';
+ if(bl.length===1&&!bl[0].fixed){const b=bl[0],s=new Date(b.startAt),e=new Date(+s+m*6e4),w=slotWhy(b,s,e);if(w)msg='Calendar session left unchanged: '+w;else{applyMove(b,s,e,'Duration set to '+fmt(m));itemSheet(tid);return}}
+ ipRe(tid);if(msg)ipErr(msg)}
+function ipSwap(tid,dir){const ds=fdate,L=planItems(ds),i=L.findIndex(x=>x.t===tid),n=L[i+dir];if(i<0||!n)return;dpMut(ds,R=>{const a=R.findIndex(x=>x.t===tid),b=R.findIndex(x=>x.t===n.t);[R[a],R[b]]=[R[b],R[a]]});ipRe(tid)}
+function moveToDay(b,ds){const s=new Date(b.startAt),dur=dmin(b),ns=at(ds,pad(s.getHours())+':'+pad(s.getMinutes())),ne=new Date(+ns+dur*6e4),t=b.taskId&&tById(b.taskId);let w=slotWhy(b,ns,ne);if(!w&&t&&t.dueDate&&ds>t.dueDate)w='That is after the deadline ('+fd(t.dueDate)+').';if(w){toast('Not moved: '+w);return false}applyMove(b,ns,ne,'Moved to '+fd(ds)+' · '+tf(ns));return true}
+Object.assign(ACT,{
+ pbktoggle(){S.set.pbko=!pbkOpen();save();render()},pbkmore(){S.set.pbkm=!S.set.pbkm;save();render()},
+ pbkplace(d){const i=itemOf(fdate,d.id);plS={id:d.id,min:i?i.min:30};placeSheet()},
+ plslot(d){const s=new Date(+d.s),e=new Date(+d.s+plS.min*6e4),w=dayPlace(plS.id,s,e);if(w)ipErr(w);else closeSheet()},
+ plcustom(){const v=($('#pl-ct')||{}).value;if(!v)return;const s=at(fdate,v),e=new Date(+s+plS.min*6e4),w=dayPlace(plS.id,s,e);if(w)ipErr(w);else closeSheet()},
+ pbkadd(){addSheet()},pbkpick(d){dpMut(fdate,L=>{if(!L.some(i=>i.t===d.id))L.push({t:d.id,min:+d.m||30})});S.set.pbko=true;closeSheet();save();render();itemSheet(d.id)},
+ itemedit(d){itemSheet(d.id)},ipmin(d){ipSetMin(d.id,+d.m)},ipminset(d){ipSetMin(d.id,+($('#ip-min')||{}).value||30)},
+ ipslot(d){const i=itemOf(fdate,d.id);if(!i)return;const s=new Date(+d.s),w=dayPlace(d.id,s,new Date(+s+i.min*6e4));if(w)ipErr(w);else closeSheet()},
+ ipplace(d){const v=($('#ip-t')||{}).value,i=itemOf(fdate,d.id);if(!v||!i)return;const s=at(fdate,v),bl=itemBlocks(fdate,d.id);let w;
+  if(bl.length){const b=bl[0],e=new Date(+s+dmin(b)*6e4);w=slotWhy(b,s,e);if(!w){applyMove(b,s,e,'Moved to '+tf(s));closeSheet();return}}else{w=dayPlace(d.id,s,new Date(+s+i.min*6e4));if(!w){closeSheet();return}}ipErr(w)},
+ ipup(d){ipSwap(d.id,-1)},ipdn(d){ipSwap(d.id,1)},
+ iprem(d){const ds=fdate,keep=planItems(ds).find(i=>i.t===d.id);dpMut(ds,L=>{const k=L.findIndex(i=>i.t===d.id);if(k>=0)L.splice(k,1)});closeSheet();save();render();toast('Removed from this day',()=>{dpMut(ds,L=>L.push(keep));render()})},
+ logblk(d){closeM();logSheet(d.id)},
+ dgrid(){S.set.dayGrid=!S.set.dayGrid;save();render()},
+ rectoggle(){S.set.recOpen=!S.set.recOpen;save();render()},
+ recplace(d){plS={id:d.id,min:+d.m||30};placeSheet()},
+ fcadd(d){const w=dayPlace(d.t,new Date(d.s),new Date(d.e));if(w)toast('⚠ '+w)},
+ arvopen(){const L=autoBlocks();if(!L.length)return;const by={};L.forEach(b=>{by[b.taskId]=(by[b.taskId]||0)+1});sheet('Auto-generated sessions',`<div class="plsh"><small class="mut">Focusy placed these before you could choose. Removing them only clears their calendar times. Your tasks, completed focus history, fixed commitments and sessions you placed yourself are untouched.</small>${Object.keys(by).map(id=>`<div class="aar"><b>${esc((tById(id)||{}).title||'Task')}</b><span>${by[id]} session${by[id]>1?'s':''}</span></div>`).join('')}<div class="btns stk"><button type="button" class="btn" data-act="arvrm">Remove ${L.length} calendar placement${L.length>1?'s':''}</button><button type="button" class="btn g" data-act="arvkeep">Keep them for now</button></div></div>`)},
+ arvrm(){const keep=autoBlocks(),ids=new Set(keep.map(b=>b.id));S.blocks=S.blocks.filter(b=>!ids.has(b.id));S.set.autoReviewed=true;closeSheet();save();render();toast(keep.length+' placements removed',()=>{S.blocks.push(...keep);S.set.autoReviewed=false;save();render()})},
+ arvkeep(){S.set.autoReviewed=true;closeSheet();save();render()},
+ wkmv(d){const b=S.blocks.find(x=>x.id===d.id);if(!b)return;const ws=weekStartOf(fdate);sheet('Move to another day',`<div class="plsh"><b>${esc(btitle(b))}</b> <small class="mut">${tf(new Date(b.startAt))} · ${dmn(dmin(b))} — the time stays the same</small><div class="chips">${[...Array(7)].map((_,i)=>addDays(ws,i)).map(x=>`<button type="button" class="chip${x===b.date?' on':''}" data-act="wkmvto" data-id="${b.id}" data-d="${x}"${x===b.date||x<today()?' disabled':''}>${new Date(x+'T00:00').toLocaleDateString([],{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>`)},
+ wkmvto(d){const b=S.blocks.find(x=>x.id===d.id);if(!b)return;closeSheet();moveToDay(b,d.d)}});
+/* drag from the bucket: drag handle only, starts at once on touch (no long-press, no page scroll) */
+document.addEventListener('pointerdown',e=>{if(view!=='focus'||!dayGridOn()||e.button>0||dragSt)return;const g=e.target.closest('.pbkg'),el=g&&g.closest('.pbki');if(!el||el.classList.contains('pl'))return;const t=tById(el.dataset.id);if(!t)return;
+ const dur=+el.dataset.min||30,b={id:null,type:'task',taskId:t.id,title:'',startAt:new Date().toISOString(),endAt:new Date(Date.now()+dur*6e4).toISOString()};
+ dragSt={b,el,mode:'new',ix:occIndex(S.blocks),t,dur,x0:e.clientX,y0:e.clientY,on:false,pid:e.pointerId,type:e.pointerType,off:0,cur:null,sc:0,hd:true};const d=dragSt;try{g.setPointerCapture(e.pointerId)}catch(_){}
+ d.iv=setInterval(()=>{if(!d.on)return;const w=d.w;if(d.sc)w.scrollTop+=d.sc;dragPlace()},30)},true);
+ACT.plslot2=d=>{wkMsg=null;const s=new Date(+d.s);dayPlace(d.id,s,new Date(+s+d.u*6e4))};
+/* keyboard: arrow keys move a focused block by 15 min, Shift+arrows change its length */
+document.addEventListener('keydown',e=>{const el=e.target&&e.target.closest&&e.target.closest('.wb.dg');if(!el||view!=='focus'||!dayGridOn()||!/^Arrow(Up|Down)$/.test(e.key))return;const b=S.blocks.find(x=>x.id===el.dataset.id);if(!b)return;e.preventDefault();
+ const k=(e.key==='ArrowUp'?-1:1)*SNAP,s=new Date(b.startAt),dur=dmin(b);let ns=s,ne=new Date(+s+dur*6e4);if(e.shiftKey)ne=new Date(+ne+k*6e4);else{ns=new Date(+s+k*6e4);ne=new Date(+ne+k*6e4)}
+ if(+ne-+ns<SNAP*6e4)return;const w=slotWhy(b,ns,ne);if(w){wkShow('<span class="warn">⚠ '+w+'</span>');return}applyMove(b,ns,ne,e.shiftKey?'Duration set to '+fmt(Math.round((ne-ns)/6e4)):'Moved to '+tf(ns));requestAnimationFrame(()=>{const n=document.querySelector('.wb[data-id="'+b.id+'"]');if(n)n.focus()})});
+
 /* tap an empty spot of a day column = new block there */
-document.addEventListener('click',e=>{const c=e.target.classList&&e.target.classList.contains('dc')?e.target:e.target.classList&&e.target.classList.contains('fz')?e.target.parentNode:null;if(!c||view!=='focus'||FV()!=='week')return;
+document.addEventListener('click',e=>{const c=e.target.classList&&e.target.classList.contains('dc')?e.target:e.target.classList&&e.target.classList.contains('fz')?e.target.parentNode:null;if(!c||view!=='focus'||!(FV()==='week'||dayGridOn()))return;
  const r=c.getBoundingClientRect(),m=Math.floor((e.clientY-r.top)/PPM/SNAP)*SNAP;nbPre={date:c.dataset.d,time:pad(Math.floor(m/60))+':'+pad(m%60)};blockModal()});
 let nbPre=null;
 /* ---------- One Thing mode: current task, living mountain scene, real-progress journey, Task Bucket ---------- */
@@ -1542,7 +1786,7 @@ document.addEventListener('pointerup',()=>bkEnd(true),true);document.addEventLis
 document.addEventListener('touchmove',e=>{if(bkd&&bkd.on)e.preventDefault()},{passive:false});
 try{const lp=()=>{document.body.classList.toggle('lp',(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))};lp();navigator.getBattery&&navigator.getBattery().then(b=>{const f=()=>document.body.classList.toggle('lp',(!b.charging&&b.level<=.2)||(navigator.deviceMemory&&navigator.deviceMemory<=2));f();b.addEventListener('levelchange',f);b.addEventListener('chargingchange',f)})}catch(e){}
 document.addEventListener('visibilitychange',()=>document.body.classList.toggle('bgd',document.hidden));
-function premiumFocus(){const f=FV();if(f==='one')return oneView();if(f==='week')return`${fvHead()}${weekView()}`;return`${fvHead()}${VIEWS.focusDay()}`}
+function premiumFocus(){const f=FV();PPM=(f==='day'&&S.set.dayGrid)?1.2:.8;if(f==='one')return oneView();if(f==='week')return`${fvHead()}${weekView()}`;return`${fvHead()}${VIEWS.focusDay()}`}
 
 /* ================= Today: compact gateway (One Thing · Next Up · Quick Add) ================= */
 const goFocus=(mode,date)=>{view='focus';S.set.fv=mode||'one';if(date)fdate=date;save();render();scrollTo(0,0)};
@@ -1681,7 +1925,7 @@ function render(){{const live=new Set(S.tasks.filter(t=>!t.deletedAt).map(t=>t.i
 
  const r=document.documentElement;S.set.theme==='auto'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',S.set.theme);
  $('#nav').innerHTML=BRAND+V.map(([k,l,i])=>`<button class="nv${k===view?' on':''}${k==='one'?' hm':''}" data-nav="${k}" ${k===view?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}</button>`).join('');
- document.body.dataset.v=view;const mm=$('#main'),ch=mm.dataset.v!==view;mm.dataset.v=view;mm.classList.toggle('enter',ch);mm.classList.toggle('pm',view==='focus'||view==='today');document.body.dataset.fv=FV();mm.innerHTML=VIEWS[view]();lastNow='';setLogo();postRender();if(view==='focus'&&FV()==='week')wkRestore()}
+ document.body.dataset.v=view;const mm=$('#main'),ch=mm.dataset.v!==view;mm.dataset.v=view;mm.classList.toggle('enter',ch);mm.classList.toggle('pm',view==='focus'||view==='today');document.body.dataset.fv=FV();mm.innerHTML=VIEWS[view]();lastNow='';setLogo();postRender();if(view==='focus'&&(FV()==='week'||dayGridOn()))wkRestore()}
 /* live clock: real device time, no offsets; re-evaluates every second, on resume, and on date change */
 let lastMin=-1,lastDay=today(),lastNow='';
 function tick(){checkDone();mvTick();cbTick();{const z=S.sess;if(z){const l=z.mv&&z.mv.state==='break'?z.mv.breakEnd-Date.now():z.resumedAt?z.plannedMs-sessMs(z):1e9;if(l>0&&l<1100)setTimeout(()=>{checkDone();mvTick();if(S.sess)tickTimer()},l+10)}}if(S.sess){tickTimer();pillUpd()}if(inlineOne())oneSync();else if(view==='today')todaySync();else if(view==='focus'&&S.sess){const c=$('#schipt');if(c)c.textContent=clock(S.sess.plannedMs-sessMs(S.sess))}if(jmode()&&!jr.raf){const v=jview();if(v&&v.st==='run')jrDraw()}const n=new Date(),c=$('#clk');if(c)c.textContent=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
